@@ -19,7 +19,7 @@ public class Rules {
         List<List<Element>> grid = level.getGrid();
         for (int i = 0; i < grid.size(); i++) {
             for (int j = 0; j < grid.get(i).size(); j++) {
-                if (grid.get(i).get(j).getWord() != null && grid.get(i).get(j).getWord().getOperator() == Word.Operator.IS) {
+                if (grid.get(i).get(j).getWord() != null && grid.get(i).get(j).getWord().getOperator() == Operator.IS) {
                     if (i > 0 && i < grid.size() - 1) {
                         // Check vertical rules
                         Element above = grid.get(i - 1).get(j);

@@ -1,28 +1,24 @@
 package baba.is.you;
 
-import baba.is.you.Word.Noun;
-import baba.is.you.Word.Operator;
-import baba.is.you.Word.Property;
-
 public enum Element {
-    BABA(Word.Noun.BABA),
-    FLAG(Word.Noun.FLAG),
-    WALL(Word.Noun.WALL),
-    WATER(Word.Noun.WATER),
-    SKULL(Word.Noun.SKULL),
-    LAVA(Word.Noun.LAVA),
-    ROCK(Word.Noun.ROCK),
+    BABA(Noun.BABA),
+    FLAG(Noun.FLAG),
+    WALL(Noun.WALL),
+    WATER(Noun.WATER),
+    SKULL(Noun.SKULL),
+    LAVA(Noun.LAVA),
+    ROCK(Noun.ROCK),
 
-    IS(Word.Operator.IS),
+    IS(Operator.IS),
 
-    YOU(Word.Property.YOU),
-    WIN(Word.Property.WIN),
-    STOP(Word.Property.STOP),
-    PUSH(Word.Property.PUSH),
-    MELT(Word.Property.MELT),
-    HOT(Word.Property.HOT),
-    DEFEAT(Word.Property.DEFEAT),
-    SINK(Word.Property.SINK),
+    YOU(Property.YOU),
+    WIN(Property.WIN),
+    STOP(Property.STOP),
+    PUSH(Property.PUSH),
+    MELT(Property.MELT),
+    HOT(Property.HOT),
+    DEFEAT(Property.DEFEAT),
+    SINK(Property.SINK),
 
     ENTITY_BABA(Entity.BABA),
     ENTITY_FLAG(Entity.FLAG),
