@@ -1,6 +1,19 @@
 package baba.is.you;
 
 public class Word {
+	
+	public enum Noun {
+	    BABA, FLAG, WALL, WATER, SKULL, LAVA, ROCK;
+	}
+	
+	public enum Operator {
+	    IS;
+	}
+	
+	public enum Property {
+	    YOU, WIN, STOP, PUSH, MELT, HOT, DEFEAT, SINK;
+	}
+	
     private final Noun noun;
     private final Operator operator;
     private final Property property;

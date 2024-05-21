@@ -1,24 +1,24 @@
 package baba.is.you;
 
 public enum Element {
-    BABA(Noun.BABA),
-    FLAG(Noun.FLAG),
-    WALL(Noun.WALL),
-    WATER(Noun.WATER),
-    SKULL(Noun.SKULL),
-    LAVA(Noun.LAVA),
-    ROCK(Noun.ROCK),
+    BABA(Word.Noun.BABA),
+    FLAG(Word.Noun.FLAG),
+    WALL(Word.Noun.WALL),
+    WATER(Word.Noun.WATER),
+    SKULL(Word.Noun.SKULL),
+    LAVA(Word.Noun.LAVA),
+    ROCK(Word.Noun.ROCK),
 
-    IS(Operator.IS),
+    IS(Word.Operator.IS),
 
-    YOU(Property.YOU),
-    WIN(Property.WIN),
-    STOP(Property.STOP),
-    PUSH(Property.PUSH),
-    MELT(Property.MELT),
-    HOT(Property.HOT),
-    DEFEAT(Property.DEFEAT),
-    SINK(Property.SINK),
+    YOU(Word.Property.YOU),
+    WIN(Word.Property.WIN),
+    STOP(Word.Property.STOP),
+    PUSH(Word.Property.PUSH),
+    MELT(Word.Property.MELT),
+    HOT(Word.Property.HOT),
+    DEFEAT(Word.Property.DEFEAT),
+    SINK(Word.Property.SINK),
 
     ENTITY_BABA(Entity.BABA),
     ENTITY_FLAG(Entity.FLAG),
@@ -32,17 +32,17 @@ public enum Element {
     private final Word word;
     private final Entity entity;
 
-    Element(Noun noun) {
+    Element(Word.Noun noun) {
         this.word = new Word(noun);
         this.entity = null;
     }
 
-    Element(Operator operator) {
+    Element(Word.Operator operator) {
         this.word = new Word(operator);
         this.entity = null;
     }
 
-    Element(Property property) {
+    Element(Word.Property property) {
         this.word = new Word(property);
         this.entity = null;
     }
