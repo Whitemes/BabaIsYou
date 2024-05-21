@@ -57,8 +57,9 @@ public class Level {
             return false;
         }
 
-        // Si l'élément peut être poussé
-        if (target == Element.ROCK || target == Element.FLAG) {
+        // Si l'élément peut être poussé ou s'il s'agit d'un mot (Noun, Operator, Property)
+        if (target == Element.ROCK || target == Element.FLAG ||
+            target.getWord() != null) {
             int dx = newX - oldX;
             int dy = newY - oldY;
             int nextX = newX + dx;
