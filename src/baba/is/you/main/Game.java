@@ -17,60 +17,87 @@ public class Game {
     private final Map<String, Element> elementMap;
 
     /**
-     * Constructor for Game class
+     * Constructor for Game class.
      *
-     * @param levelsPath the path to the levels file
+     * @param levelFilePath the path to the levels file
      */
-    public Game(String levelsPath) {
+    public Game(String levelFilePath) {
         this.scanner = new Scanner(System.in);
-        this.elementMap = createElementMap(); 
-        this.levels = loadLevels(levelsPath);
+        this.elementMap = createElementMap();
+        this.levels = loadLevels(levelFilePath);
         this.currentLevelIndex = 0;
     }
 
     /**
-     * Start the game
+     * Starts the game, iterating through each level until the game is completed.
      */
     public void start() {
         while (currentLevelIndex < levels.size()) {
             Level level = levels.get(currentLevelIndex);
             Rules rules = new Rules(level);
-            while (!level.isCompleted()) {
-                renderCurrentLevel();
-                char input = getUserInput();
-                try {
-                    Direction direction = Direction.fromChar(input);
-                    level.update(direction);
-                    rules.initRules(level); // Reinitialize rules after each move
-                    rules.printRules(); // Print current rules
-                    if (level.isCompleted()) {
-                        currentLevelIndex++;
-                        if (currentLevelIndex < levels.size()) {
-                            renderCurrentLevel();
-                        } else {
-                            System.out.println("\nCongratulations! You've completed the game.");
-                        }
-                    }
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Invalid move. Use 'z' (up), 's' (down), 'q' (left), 'd' (right).");
-                }
-            }
+            playLevel(level, rules);
         }
         scanner.close();
     }
 
     /**
-     * Render the current level
+     * Plays a single level.
+     *
+     * @param level the current level to be played
+     * @param rules the rules applicable to the current level
      */
-    private void renderCurrentLevel() {
-        Level level = levels.get(currentLevelIndex);
-        level.render();
+    private void playLevel(Level level, Rules rules) {
+        while (!level.isCompleted()) {
+            renderCurrentLevel();
+            char input = getUserInput();
+            processInput(level, rules, input);
+        }
     }
 
     /**
-     * Get user input for the next move
+     * Processes the user input and updates the level accordingly.
      *
-     * @return the input character
+     * @param level the current level to be updated
+     * @param rules the rules applicable to the current level
+     * @param input the user input for the direction
+     */
+    private void processInput(Level level, Rules rules, char input) {
+        try {
+            Direction direction = Direction.fromChar(input);
+            level.update(direction);
+            rules.initRules(level);
+            rules.printRules();
+            checkLevelCompletion();
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid move. Use 'z' (up), 's' (down), 'q' (left), 'd' (right).");
+        }
+    }
+
+    /**
+     * Checks if the current level is completed and moves to the next level if it is.
+     */
+    private void checkLevelCompletion() {
+        if (levels.get(currentLevelIndex).isCompleted()) {
+            currentLevelIndex++;
+            if (currentLevelIndex < levels.size()) {
+                renderCurrentLevel();
+            } else {
+                System.out.println("\nCongratulations! You've completed the game.");
+            }
+        }
+    }
+
+    /**
+     * Renders the current level.
+     */
+    private void renderCurrentLevel() {
+        levels.get(currentLevelIndex).render();
+    }
+
+    /**
+     * Gets user input for the next move.
+     *
+     * @return the input character representing the direction
      */
     private char getUserInput() {
         System.out.print("Enter your move (z for up, s for down, q for left, d for right): ");
@@ -79,34 +106,15 @@ public class Game {
     }
 
     /**
-     * Load levels from the given file path
+     * Loads levels from the given file path.
      *
      * @param path the path to the levels file
      * @return a list of levels
      */
     private List<Level> loadLevels(String path) {
         List<Level> levels = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
-            String line;
-            List<List<Element>> grid = new ArrayList<>();
-            while ((line = br.readLine()) != null) {
-                if (line.trim().isEmpty()) {
-                    if (!grid.isEmpty()) {
-                        levels.add(new Level(grid));
-                        grid = new ArrayList<>();
-                    }
-                } else {
-                    List<Element> row = new ArrayList<>();
-                    String[] tokens = line.split(" ");
-                    for (String token : tokens) {
-                        row.add(elementMap.getOrDefault(token, Element.EMPTY));
-                    }
-                    grid.add(row);
-                }
-            }
-            if (!grid.isEmpty()) {
-                levels.add(new Level(grid));
-            }
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+            loadLevelsFromFile(reader, levels);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -114,9 +122,57 @@ public class Game {
     }
 
     /**
-     * Create a map for element string to Element conversion
+     * Loads levels from the BufferedReader and adds them to the levels list.
      *
-     * @return the map of string tokens to Elements
+     * @param reader the BufferedReader to read the levels from
+     * @param levels the list to store the loaded levels
+     * @throws IOException if an I/O error occurs
+     */
+    private void loadLevelsFromFile(BufferedReader reader, List<Level> levels) throws IOException {
+        String line;
+        List<List<Element>> grid = new ArrayList<>();
+        while ((line = reader.readLine()) != null) {
+            if (line.isEmpty()) {
+                addGridToLevels(levels, grid);
+                grid = new ArrayList<>();
+            } else {
+                grid.add(parseLineToRow(line));
+            }
+        }
+        addGridToLevels(levels, grid);
+    }
+
+    /**
+     * Adds the grid to the levels list if it is not empty.
+     *
+     * @param levels the list of levels
+     * @param grid the grid to be added
+     */
+    private void addGridToLevels(List<Level> levels, List<List<Element>> grid) {
+        if (!grid.isEmpty()) {
+            levels.add(new Level(grid));
+        }
+    }
+
+    /**
+     * Parses a line of text into a row of elements.
+     *
+     * @param line the line of text to parse
+     * @return a list of elements
+     */
+    private List<Element> parseLineToRow(String line) {
+        List<Element> row = new ArrayList<>();
+        String[] tokens = line.split(" ");
+        for (String token : tokens) {
+            row.add(elementMap.getOrDefault(token, Element.EMPTY));
+        }
+        return row;
+    }
+
+    /**
+     * Creates a map for converting string tokens to elements.
+     *
+     * @return the map of string tokens to elements
      */
     private Map<String, Element> createElementMap() {
         Map<String, Element> map = new HashMap<>();

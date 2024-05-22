@@ -34,32 +34,81 @@ public class Rules {
         List<List<Element>> grid = level.getGrid();
         for (int i = 0; i < grid.size(); i++) {
             for (int j = 0; j < grid.get(i).size(); j++) {
-                if (grid.get(i).get(j).getWord() != null && grid.get(i).get(j).getWord().getOperator() == Word.Operator.IS) {
-                    if (i > 0 && i < grid.size() - 1) {
-                        // Check vertical rules
-                        Element above = grid.get(i - 1).get(j);
-                        Element below = grid.get(i + 1).get(j);
-                        if (above.getWord() != null && below.getWord() != null) {
-                            if (above.getWord().getNoun() != null && below.getWord().getProperty() != null) {
-                                activeRules.add(above.getWord().getNoun() + " IS " + below.getWord().getProperty());
-                                nounToProperty.put(above.getWord().getNoun(), below.getWord().getProperty());
-                            }
-                        }
-                    }
-                    if (j > 0 && j < grid.get(i).size() - 1) {
-                        // Check horizontal rules
-                        Element left = grid.get(i).get(j - 1);
-                        Element right = grid.get(i).get(j + 1);
-                        if (left.getWord() != null && right.getWord() != null) {
-                            if (left.getWord().getNoun() != null && right.getWord().getProperty() != null) {
-                                activeRules.add(left.getWord().getNoun() + " IS " + right.getWord().getProperty());
-                                nounToProperty.put(left.getWord().getNoun(), right.getWord().getProperty());
-                            }
-                        }
-                    }
+                if (isOperatorIs(grid, i, j)) {
+                    checkVerticalRules(grid, i, j);
+                    checkHorizontalRules(grid, i, j);
                 }
             }
         }
+    }
+
+    /**
+     * Check for vertical rules at the given position in the grid
+     *
+     * @param grid the grid of elements
+     * @param i    the row index
+     * @param j    the column index
+     */
+    private void checkVerticalRules(List<List<Element>> grid, int i, int j) {
+        if (i > 0 && i < grid.size() - 1) {
+            Element above = grid.get(i - 1).get(j);
+            Element below = grid.get(i + 1).get(j);
+            if (isValidRule(above, below)) {
+                addRule(above.getWord().getNoun(), below.getWord().getProperty());
+            }
+        }
+    }
+
+    /**
+     * Check for horizontal rules at the given position in the grid
+     *
+     * @param grid the grid of elements
+     * @param i    the row index
+     * @param j    the column index
+     */
+    private void checkHorizontalRules(List<List<Element>> grid, int i, int j) {
+        if (j > 0 && j < grid.get(i).size() - 1) {
+            Element left = grid.get(i).get(j - 1);
+            Element right = grid.get(i).get(j + 1);
+            if (isValidRule(left, right)) {
+                addRule(left.getWord().getNoun(), right.getWord().getProperty());
+            }
+        }
+    }
+
+    /**
+     * Determine if the given elements form a valid rule
+     *
+     * @param first  the first element
+     * @param second the second element
+     * @return true if the elements form a valid rule, false otherwise
+     */
+    private boolean isValidRule(Element first, Element second) {
+        return first.getWord() != null && second.getWord() != null
+                && first.getWord().getNoun() != null && second.getWord().getProperty() != null;
+    }
+
+    /**
+     * Add a rule to the active rules set and the noun to property map
+     *
+     * @param noun     the noun in the rule
+     * @param property the property in the rule
+     */
+    private void addRule(Word.Noun noun, Word.Property property) {
+        activeRules.add(noun + " IS " + property);
+        nounToProperty.put(noun, property);
+    }
+
+    /**
+     * Check if the element at the given position is an 'IS' operator
+     *
+     * @param grid the grid of elements
+     * @param i    the row index
+     * @param j    the column index
+     * @return true if the element is an 'IS' operator, false otherwise
+     */
+    private boolean isOperatorIs(List<List<Element>> grid, int i, int j) {
+        return grid.get(i).get(j).getWord() != null && grid.get(i).get(j).getWord().getOperator() == Word.Operator.IS;
     }
 
     /**

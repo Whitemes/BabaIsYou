@@ -47,24 +47,48 @@ public class Level {
         int dx = direction.getDx();
         int dy = direction.getDy();
         Set<Element> winElements = rules.getWinElements();
+        updateEntities(dx, dy, winElements);
+    }
+
+    /**
+     * Update the entities in the grid based on the direction
+     *
+     * @param dx         the change in x-coordinate
+     * @param dy         the change in y-coordinate
+     * @param winElements the set of elements that result in a win
+     */
+    private void updateEntities(int dx, int dy, Set<Element> winElements) {
         for (int x = 0; x < grid.size(); x++) {
             for (int y = 0; y < grid.get(x).size(); y++) {
                 if (grid.get(x).get(y) == Element.ENTITY_BABA) {
-                    int newX = x + dx;
-                    int newY = y + dy;
-                    if (isWithinBounds(newX, newY)) {
-                        Element target = grid.get(newX).get(newY);
-                        if (winElements.contains(target)) {
-                            System.out.println("You Win!");
-                            System.exit(0);
-                        }
-                        if (pushRecursive(x, y, newX, newY)) {
-                            grid.get(x).set(y, Element.EMPTY);
-                            grid.get(newX).set(newY, Element.ENTITY_BABA);
-                        }
-                    }
+                    handleEntityMove(x, y, dx, dy, winElements);
                     return;
                 }
+            }
+        }
+    }
+
+    /**
+     * Handle the movement of an entity in the grid
+     *
+     * @param x          the original x-coordinate
+     * @param y          the original y-coordinate
+     * @param dx         the change in x-coordinate
+     * @param dy         the change in y-coordinate
+     * @param winElements the set of elements that result in a win
+     */
+    private void handleEntityMove(int x, int y, int dx, int dy, Set<Element> winElements) {
+        int newX = x + dx;
+        int newY = y + dy;
+        if (isWithinBounds(newX, newY)) {
+            Element target = grid.get(newX).get(newY);
+            if (winElements.contains(target)) {
+                System.out.println("You Win!");
+                System.exit(0);
+            }
+            if (pushRecursive(x, y, newX, newY)) {
+                grid.get(x).set(y, Element.EMPTY);
+                grid.get(newX).set(newY, Element.ENTITY_BABA);
             }
         }
     }
@@ -83,7 +107,7 @@ public class Level {
         Element target = grid.get(newX).get(newY);
         if (target == Element.EMPTY) return true;
         if (target == Element.ENTITY_WALL) return false;
-        if (target == Element.ROCK || target == Element.FLAG || target.getWord() != null) {
+        if (isPushable(target)) {
             int dx = newX - oldX;
             int dy = newY - oldY;
             int nextX = newX + dx;
@@ -95,6 +119,16 @@ public class Level {
             }
         }
         return false;
+    }
+
+    /**
+     * Check if the given element can be pushed
+     *
+     * @param element the element to check
+     * @return true if the element can be pushed, false otherwise
+     */
+    private boolean isPushable(Element element) {
+        return element.getWord() != null;
     }
 
     /**
