@@ -1,21 +1,26 @@
 package baba.is.you;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Rules {
     private Level level;
     private Set<String> activeRules;
+    private Map<Word.Noun, Word.Property> nounToProperty;
 
     public Rules(Level level) {
         this.level = level;
         this.activeRules = new HashSet<>();
+        this.nounToProperty = new HashMap<>();
         initRules(level);
     }
 
     public void initRules(Level level) {
         activeRules.clear();
+        nounToProperty.clear();
         List<List<Element>> grid = level.getGrid();
         for (int i = 0; i < grid.size(); i++) {
             for (int j = 0; j < grid.get(i).size(); j++) {
@@ -27,6 +32,7 @@ public class Rules {
                         if (above.getWord() != null && below.getWord() != null) {
                             if (above.getWord().getNoun() != null && below.getWord().getProperty() != null) {
                                 activeRules.add(above.getWord().getNoun() + " IS " + below.getWord().getProperty());
+                                nounToProperty.put(above.getWord().getNoun(), below.getWord().getProperty());
                             }
                         }
                     }
@@ -37,6 +43,7 @@ public class Rules {
                         if (left.getWord() != null && right.getWord() != null) {
                             if (left.getWord().getNoun() != null && right.getWord().getProperty() != null) {
                                 activeRules.add(left.getWord().getNoun() + " IS " + right.getWord().getProperty());
+                                nounToProperty.put(left.getWord().getNoun(), right.getWord().getProperty());
                             }
                         }
                     }
@@ -54,5 +61,15 @@ public class Rules {
 
     public Set<String> getActiveRules() {
         return activeRules;
+    }
+
+    public Set<Element> getWinElements() {
+        Set<Element> winElements = new HashSet<>();
+        for (Map.Entry<Word.Noun, Word.Property> entry : nounToProperty.entrySet()) {
+            if (entry.getValue() == Word.Property.WIN) {
+                winElements.add(Element.valueOf("ENTITY_" + entry.getKey().name()));
+            }
+        }
+        return winElements;
     }
 }

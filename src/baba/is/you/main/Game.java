@@ -27,8 +27,8 @@ public class Game {
                 try {
                     Direction direction = Direction.fromChar(input);
                     level.update(direction);
-                    rules.initRules(level);
-                    rules.printRules();
+                    rules.initRules(level); // Reinitialiser les règles après chaque mouvement
+                    rules.printRules(); // Afficher les règles actuelles
                     if (level.isCompleted()) {
                         currentLevelIndex++;
                         if (currentLevelIndex < levels.size()) {
