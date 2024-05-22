@@ -37,27 +37,17 @@ public class Level {
                             grid.get(newX).set(newY, Element.ENTITY_BABA);
                         }
                     }
-                    return; // Exit after the first move to prevent multiple moves in a single update
+                    return;
                 }
             }
         }
     }
 
     private boolean pushRecursive(int oldX, int oldY, int newX, int newY) {
-        if (!isWithinBounds(newX, newY)) {
-            return false;
-        }
-
+        if (!isWithinBounds(newX, newY)) return false;
         Element target = grid.get(newX).get(newY);
-        if (target == Element.EMPTY) {
-            return true;
-        }
-
-        if (target == Element.ENTITY_WALL) {
-            return false;
-        }
-
-        // Si l'élément peut être poussé ou s'il s'agit d'un mot (Noun, Operator, Property)
+        if (target == Element.EMPTY) return true;
+        if (target == Element.ENTITY_WALL) return false;
         if (target == Element.ROCK || target == Element.FLAG ||
             target.getWord() != null) {
             int dx = newX - oldX;
@@ -70,7 +60,6 @@ public class Level {
                 return true;
             }
         }
-
         return false;
     }
 
