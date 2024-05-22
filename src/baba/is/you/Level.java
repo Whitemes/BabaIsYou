@@ -46,9 +46,7 @@ public class Level {
     public void update(Direction direction) {
         int dx = direction.getDx();
         int dy = direction.getDy();
-
         Set<Element> winElements = rules.getWinElements();
-
         for (int x = 0; x < grid.size(); x++) {
             for (int y = 0; y < grid.get(x).size(); y++) {
                 if (grid.get(x).get(y) == Element.ENTITY_BABA) {
@@ -58,7 +56,7 @@ public class Level {
                         Element target = grid.get(newX).get(newY);
                         if (winElements.contains(target)) {
                             System.out.println("You Win!");
-                            System.exit(0); // Exit the game
+                            System.exit(0);
                         }
                         if (pushRecursive(x, y, newX, newY)) {
                             grid.get(x).set(y, Element.EMPTY);
