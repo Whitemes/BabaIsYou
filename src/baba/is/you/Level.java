@@ -7,15 +7,28 @@ public class Level {
     private List<List<Element>> grid;
     private Rules rules;
 
+    /**
+     * Constructor for Level class
+     * 
+     * @param grid the grid for the current level
+     */
     public Level(List<List<Element>> grid) {
         this.grid = grid;
         this.rules = new Rules(this);
     }
 
+    /**
+     * Get the grid for the current level
+     * 
+     * @return the grid of elements
+     */
     public List<List<Element>> getGrid() {
         return grid;
     }
 
+    /**
+     * Render the current grid to the console
+     */
     public void render() {
         for (List<Element> row : grid) {
             for (Element element : row) {
@@ -25,6 +38,11 @@ public class Level {
         }
     }
 
+    /**
+     * Update the level based on the given direction
+     * 
+     * @param direction the direction to move
+     */
     public void update(Direction direction) {
         int dx = direction.getDx();
         int dy = direction.getDy();
@@ -53,6 +71,15 @@ public class Level {
         }
     }
 
+    /**
+     * Recursively push elements in the grid
+     * 
+     * @param oldX the original x-coordinate
+     * @param oldY the original y-coordinate
+     * @param newX the new x-coordinate
+     * @param newY the new y-coordinate
+     * @return true if the push was successful, false otherwise
+     */
     private boolean pushRecursive(int oldX, int oldY, int newX, int newY) {
         if (!isWithinBounds(newX, newY)) return false;
         Element target = grid.get(newX).get(newY);
@@ -72,10 +99,22 @@ public class Level {
         return false;
     }
 
+    /**
+     * Check if the given coordinates are within the bounds of the grid
+     * 
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     * @return true if within bounds, false otherwise
+     */
     private boolean isWithinBounds(int x, int y) {
         return x >= 0 && x < grid.size() && y >= 0 && y < grid.get(0).size();
     }
 
+    /**
+     * Check if the level is completed
+     * 
+     * @return true if the level is completed, false otherwise
+     */
     public boolean isCompleted() {
         // This method can remain unchanged if it is not being used to detect win condition
         return false;

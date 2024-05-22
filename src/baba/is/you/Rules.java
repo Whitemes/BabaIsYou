@@ -11,6 +11,11 @@ public class Rules {
     private Set<String> activeRules;
     private Map<Word.Noun, Word.Property> nounToProperty;
 
+    /**
+     * Constructor for Rules class
+     * 
+     * @param level the current game level
+     */
     public Rules(Level level) {
         this.level = level;
         this.activeRules = new HashSet<>();
@@ -18,6 +23,11 @@ public class Rules {
         initRules(level);
     }
 
+    /**
+     * Initialize rules based on the current level's grid
+     * 
+     * @param level the current game level
+     */
     public void initRules(Level level) {
         activeRules.clear();
         nounToProperty.clear();
@@ -52,6 +62,9 @@ public class Rules {
         }
     }
 
+    /**
+     * Print the active rules to the console
+     */
     public void printRules() {
         System.out.println("Active Rules:");
         for (String rule : activeRules) {
@@ -59,10 +72,20 @@ public class Rules {
         }
     }
 
+    /**
+     * Get the set of active rules
+     * 
+     * @return the set of active rules
+     */
     public Set<String> getActiveRules() {
         return activeRules;
     }
 
+    /**
+     * Get the set of elements that have the WIN property
+     * 
+     * @return the set of elements with the WIN property
+     */
     public Set<Element> getWinElements() {
         Set<Element> winElements = new HashSet<>();
         for (Map.Entry<Word.Noun, Word.Property> entry : nounToProperty.entrySet()) {

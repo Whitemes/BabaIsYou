@@ -12,11 +12,19 @@ public class Game {
     private List<Level> levels;
     private int currentLevelIndex;
 
+    /**
+     * Constructor for Game class
+     * 
+     * @param levelsPath the path to the levels file
+     */
     public Game(String levelsPath) {
         this.levels = loadLevels(levelsPath);
         this.currentLevelIndex = 0;
     }
 
+    /**
+     * Start the game
+     */
     public void start() {
         while (currentLevelIndex < levels.size()) {
             Level level = levels.get(currentLevelIndex);
@@ -27,8 +35,8 @@ public class Game {
                 try {
                     Direction direction = Direction.fromChar(input);
                     level.update(direction);
-                    rules.initRules(level); // Reinitialiser les règles après chaque mouvement
-                    rules.printRules(); // Afficher les règles actuelles
+                    rules.initRules(level); // Reinitialize rules after each move
+                    rules.printRules(); // Print current rules
                     if (level.isCompleted()) {
                         currentLevelIndex++;
                         if (currentLevelIndex < levels.size()) {
@@ -44,11 +52,19 @@ public class Game {
         }
     }
 
+    /**
+     * Render the current level
+     */
     private void renderCurrentLevel() {
         Level level = levels.get(currentLevelIndex);
         level.render();
     }
 
+    /**
+     * Get user input for the next move
+     * 
+     * @return the input character
+     */
     private char getUserInput() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter your move (z for up, s for down, q for left, d for right): ");
@@ -56,6 +72,12 @@ public class Game {
         return input.length() > 0 ? input.charAt(0) : ' ';
     }
 
+    /**
+     * Load levels from the given file path
+     * 
+     * @param path the path to the levels file
+     * @return a list of levels
+     */
     private List<Level> loadLevels(String path) {
         List<Level> levels = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -85,6 +107,12 @@ public class Game {
         return levels;
     }
 
+    /**
+     * Convert a string token to an Element
+     * 
+     * @param token the string token
+     * @return the corresponding Element
+     */
     private Element stringToElement(String token) {
         switch (token) {
             case "b": return Element.BABA;
