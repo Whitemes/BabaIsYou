@@ -1,83 +1,161 @@
 package baba.is.you.main;
 
 import baba.is.you.*;
-import java.util.List;
-import java.util.ArrayList;
+import com.github.forax.zen.Application;
+import com.github.forax.zen.ApplicationContext;
+import com.github.forax.zen.KeyboardEvent;
+
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
+import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Game {
-    private List<Level> levels;
+    private final List<Level> levels;
     private int currentLevelIndex;
+    private final Map<String, Element> elementMap;
+    private ApplicationContext context;
+    private View view;
 
-    public Game(String levelsPath) {
-        this.levels = loadLevels(levelsPath);
+    /**
+     * Constructor for Game class.
+     *
+     * @param levelDirectoryPath the path to the levels directory
+     */
+    public Game(String levelDirectoryPath) {
+        this.elementMap = createElementMap();
+        this.levels = loadLevels(levelDirectoryPath);
         this.currentLevelIndex = 0;
     }
 
-    public void start() {
-        while (currentLevelIndex < levels.size()) {
+    /**
+     * Starts the game, iterating through each level until the game is completed.
+     */
+    public void start(ApplicationContext context) {
+        this.context = context;
+        playNextLevel();
+    }
+
+    /**
+     * Plays the next level in the sequence.
+     */
+    private void playNextLevel() {
+        if (currentLevelIndex < levels.size()) {
             Level level = levels.get(currentLevelIndex);
             Rules rules = new Rules(level);
-            while (!level.isCompleted()) {
-                renderCurrentLevel();
-                char input = getUserInput();
-                try {
-                    Direction direction = Direction.fromChar(input);
-                    level.update(direction);
-                    rules.initRules(level); // Reinitialiser les règles après chaque mouvement
-                    rules.printRules(); // Afficher les règles actuelles
-                    if (level.isCompleted()) {
-                        currentLevelIndex++;
-                        if (currentLevelIndex < levels.size()) {
-                            renderCurrentLevel();
-                        } else {
-                            System.out.println("\nCongratulations! You've completed the game.");
-                        }
-                    }
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Invalid move. Use 'z' (up), 's' (down), 'q' (left), 'd' (right).");
+            Transmutation transmutation = new Transmutation(level, rules);
+            view = View.initGameGraphics(level.getGrid(), context.getScreenInfo().height(), context.getScreenInfo().width());
+            playLevel(level, rules, transmutation);
+        } else {
+            System.out.println("\nCongratulations! You've completed the game.");
+            System.exit(0);
+        }
+    }
+
+    /**
+     * Plays a single level.
+     *
+     * @param level the current level to be played
+     * @param rules the rules applicable to the current level
+     * @param transmutation the transmutation rules applicable to the current level
+     */
+    private void playLevel(Level level, Rules rules, Transmutation transmutation) {
+        while (!level.isCompleted()) {
+            renderCurrentLevel();
+            processInput(level, rules, transmutation);
+        }
+        currentLevelIndex++;
+        playNextLevel();
+    }
+
+    /**
+     * Processes the user input and updates the level accordingly.
+     *
+     * @param level the current level to be updated
+     * @param rules the rules applicable to the current level
+     * @param transmutation the transmutation rules applicable to the current level
+     */
+    private void processInput(Level level, Rules rules, Transmutation transmutation) {
+        var event = context.pollOrWaitEvent(100);
+        if (event instanceof KeyboardEvent keyboardEvent && keyboardEvent.action() == KeyboardEvent.Action.KEY_PRESSED) {
+            try {
+                if (keyboardEvent.key() == KeyboardEvent.Key.ESCAPE) {
+                    System.out.println("Game exited.");
+                    System.exit(0);
                 }
+                Direction direction = switch (keyboardEvent.key()) {
+                    case LEFT -> Direction.LEFT;
+                    case RIGHT -> Direction.RIGHT;
+                    case UP -> Direction.UP;
+                    case DOWN -> Direction.DOWN;
+                    default -> throw new IllegalArgumentException("Invalid key");
+                };
+                level.update(direction);
+                rules.initRules(level);
+                transmutation.setTransmutation(level, rules);
+                checkLevelCompletion(level);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid move. Use arrow keys for directions.");
             }
         }
     }
 
+    /**
+     * Checks if the current level is completed.
+     *
+     * @param level the current level to be checked
+     */
+    private void checkLevelCompletion(Level level) {
+        if (level.isCompleted()) {
+            currentLevelIndex++;
+            playNextLevel();
+        }
+    }
+
+    /**
+     * Renders the current level.
+     */
     private void renderCurrentLevel() {
-        Level level = levels.get(currentLevelIndex);
-        level.render();
+        View.draw(context, levels.get(currentLevelIndex).getGrid(), view);
     }
 
-    private char getUserInput() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter your move (z for up, s for down, q for left, d for right): ");
-        String input = scanner.nextLine();
-        return input.length() > 0 ? input.charAt(0) : ' ';
-    }
-
-    private List<Level> loadLevels(String path) {
-        List<Level> levels = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+    /**
+     * Loads a single level from the given file path.
+     *
+     * @param path the path to the level file
+     * @return the loaded level
+     */
+    private Level loadLevel(String path) {
+        List<List<Cellule>> grid = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
             String line;
-            List<List<Element>> grid = new ArrayList<>();
-            while ((line = br.readLine()) != null) {
-                if (line.trim().isEmpty()) {
-                    if (!grid.isEmpty()) {
-                        levels.add(new Level(grid));
-                        grid = new ArrayList<>();
-                    }
-                } else {
-                    List<Element> row = new ArrayList<>();
-                    String[] tokens = line.split(" ");
-                    for (String token : tokens) {
-                        row.add(stringToElement(token));
-                    }
-                    grid.add(row);
+            while ((line = reader.readLine()) != null) {
+                if (!line.isEmpty()) {
+                    grid.add(parseLineToRow(line));
                 }
             }
-            if (!grid.isEmpty()) {
-                levels.add(new Level(grid));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new Level(grid);
+    }
+
+    /**
+     * Loads levels from the given directory path.
+     *
+     * @param directoryPath the path to the levels directory
+     * @return a list of levels
+     */
+    private List<Level> loadLevels(String directoryPath) {
+        List<Level> levels = new ArrayList<>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(directoryPath), "*.txt")) {
+            for (Path entry : stream) {
+                levels.add(loadLevel(entry.toString()));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,38 +163,79 @@ public class Game {
         return levels;
     }
 
-    private Element stringToElement(String token) {
-        switch (token) {
-            case "b": return Element.BABA;
-            case "f": return Element.FLAG;
-            case "w": return Element.WALL;
-            case "a": return Element.WATER;
-            case "s": return Element.SKULL;
-            case "l": return Element.LAVA;
-            case "r": return Element.ROCK;
-            case "i": return Element.IS;
-            case "y": return Element.YOU;
-            case "v": return Element.WIN;
-            case "t": return Element.STOP;
-            case "p": return Element.PUSH;
-            case "m": return Element.MELT;
-            case "x": return Element.HOT;
-            case "d": return Element.DEFEAT;
-            case "k": return Element.SINK;
-            case "B": return Element.ENTITY_BABA;
-            case "F": return Element.ENTITY_FLAG;
-            case "W": return Element.ENTITY_WALL;
-            case "A": return Element.ENTITY_WATER;
-            case "S": return Element.ENTITY_SKULL;
-            case "L": return Element.ENTITY_LAVA;
-            case "R": return Element.ENTITY_ROCK;
-            case "-": return Element.EMPTY;
-            default: return Element.EMPTY;
+    /**
+     * Parses a line of text into a row of cells.
+     *
+     * @param line the line of text to parse
+     * @return a list of cells
+     */
+    private List<Cellule> parseLineToRow(String line) {
+        List<Cellule> row = new ArrayList<>();
+        String[] tokens = line.split(" ");
+        for (String token : tokens) {
+            Cellule cell = new Cellule();
+            cell.addElement(Element.EMPTY); // Always add EMPTY element
+            Element element = stringToElement(token);
+            if (element != null && element != Element.EMPTY) {
+                cell.addElement(element);
+            }
+            row.add(cell);
         }
+        return row;
+    }
+
+    /**
+     * Converts a string token to the corresponding element.
+     *
+     * @param token the string token
+     * @return the corresponding element
+     */
+    private Element stringToElement(String token) {
+        return elementMap.getOrDefault(token, Element.EMPTY);
+    }
+
+    /**
+     * Creates a map for converting string tokens to elements.
+     *
+     * @return the map of string tokens to elements
+     */
+    private Map<String, Element> createElementMap() {
+        Map<String, Element> map = new HashMap<>();
+        map.put("b", Element.BABA);
+        map.put("f", Element.FLAG);
+        map.put("w", Element.WALL);
+        map.put("a", Element.WATER);
+        map.put("s", Element.SKULL);
+        map.put("l", Element.LAVA);
+        map.put("r", Element.ROCK);
+        map.put("i", Element.IS);
+        map.put("y", Element.YOU);
+        map.put("v", Element.WIN);
+        map.put("t", Element.STOP);
+        map.put("p", Element.PUSH);
+        map.put("m", Element.MELT);
+        map.put("x", Element.HOT);
+        map.put("d", Element.DEFEAT);
+        map.put("k", Element.SINK);
+        map.put("B", Element.ENTITY_BABA);
+        map.put("F", Element.ENTITY_FLAG);
+        map.put("W", Element.ENTITY_WALL);
+        map.put("A", Element.ENTITY_WATER);
+        map.put("S", Element.ENTITY_SKULL);
+        map.put("L", Element.ENTITY_LAVA);
+        map.put("R", Element.ENTITY_ROCK);
+        map.put("-", Element.EMPTY);
+        map.put("o", Element.FLOWER);
+        map.put("g", Element.GRASS);
+        map.put("J", Element.ENTITY_TILE);
+        map.put("j", Element.TILE);
+        return map;
     }
 
     public static void main(String[] args) {
-        Game game = new Game("assets/text/level1.txt");
-        game.start();
+        Application.run(Color.BLACK, t -> {
+            Game game = new Game("assets/text/levels");
+            game.start(t);
+        });
     }
 }

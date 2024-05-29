@@ -6,5 +6,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="lib"/>
+	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="lib" path="lib/zen-6.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

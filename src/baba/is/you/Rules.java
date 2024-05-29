@@ -1,58 +1,223 @@
 package baba.is.you;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Rules {
     private Level level;
-    private Set<String> activeRules;
+    private Map<Element, Set<Word.Property>> nounToProperty;
+    private Map<Word.Property, Set<Element>> propertyToNoun;
+    private Map<Word.Noun, Word.Noun> transformationRules;
 
+    /**
+     * Constructor for Rules class
+     * 
+     * @param level the current game level
+     */
     public Rules(Level level) {
         this.level = level;
-        this.activeRules = new HashSet<>();
+        this.nounToProperty = new HashMap<>();
+        this.propertyToNoun = new HashMap<>();
+        this.transformationRules = new HashMap<>();
         initRules(level);
     }
 
+    /**
+     * Initialize rules based on the current level grid
+     * 
+     * @param level the current game level
+     */
     public void initRules(Level level) {
-        activeRules.clear();
-        List<List<Element>> grid = level.getGrid();
+        nounToProperty.clear();
+        propertyToNoun.clear();
+        transformationRules.clear();
+        List<List<Cellule>> grid = level.getGrid();
         for (int i = 0; i < grid.size(); i++) {
             for (int j = 0; j < grid.get(i).size(); j++) {
-                if (grid.get(i).get(j).getWord() != null && grid.get(i).get(j).getWord().getOperator() == Operator.IS) {
-                    if (i > 0 && i < grid.size() - 1) {
-                        // Check vertical rules
-                        Element above = grid.get(i - 1).get(j);
-                        Element below = grid.get(i + 1).get(j);
-                        if (above.getWord() != null && below.getWord() != null) {
-                            if (above.getWord().getNoun() != null && below.getWord().getProperty() != null) {
-                                activeRules.add(above.getWord().getNoun() + " IS " + below.getWord().getProperty());
-                            }
-                        }
-                    }
-                    if (j > 0 && j < grid.get(i).size() - 1) {
-                        // Check horizontal rules
-                        Element left = grid.get(i).get(j - 1);
-                        Element right = grid.get(i).get(j + 1);
-                        if (left.getWord() != null && right.getWord() != null) {
-                            if (left.getWord().getNoun() != null && right.getWord().getProperty() != null) {
-                                activeRules.add(left.getWord().getNoun() + " IS " + right.getWord().getProperty());
-                            }
-                        }
-                    }
+                if (isOperatorIs(grid, i, j)) {
+                    checkVerticalRules(grid, i, j);
+                    checkHorizontalRules(grid, i, j);
                 }
             }
         }
     }
 
-    public void printRules() {
-        System.out.println("Active Rules:");
-        for (String rule : activeRules) {
-            System.out.println(rule);
+    private void checkVerticalRules(List<List<Cellule>> grid, int i, int j) {
+        if (i > 0 && i < grid.size() - 1) {
+            Cellule above = grid.get(i - 1).get(j);
+            Cellule below = grid.get(i + 1).get(j);
+            if (isValidRule(above, below)) {
+                if (above.hasNoun() && below.hasNoun()) {
+                    addTransformationRule(above.getNoun(), below.getNoun());
+                } else {
+                    addRule(getEntityByNoun(above.getNoun()), below.getProperty());
+                }
+            }
         }
     }
 
-    public Set<String> getActiveRules() {
-        return activeRules;
+    private void checkHorizontalRules(List<List<Cellule>> grid, int i, int j) {
+        if (j > 0 && j < grid.get(i).size() - 1) {
+            Cellule left = grid.get(i).get(j - 1);
+            Cellule right = grid.get(i).get(j + 1);
+            if (isValidRule(left, right)) {
+                if (left.hasNoun() && right.hasNoun()) {
+                    addTransformationRule(left.getNoun(), right.getNoun());
+                } else {
+                    addRule(getEntityByNoun(left.getNoun()), right.getProperty());
+                }
+            }
+        }
+    }
+
+    private boolean isValidRule(Cellule first, Cellule second) {
+        return first.hasNoun() && (second.hasProperty() || second.hasNoun());
+    }
+
+    private void addRule(Element noun, Word.Property property) {
+        // Add to nounToProperty map
+        nounToProperty.computeIfAbsent(noun, k -> new HashSet<>()).add(property);
+
+        // Add to propertyToNoun map
+        propertyToNoun.computeIfAbsent(property, k -> new HashSet<>()).add(noun);
+    }
+
+    private void addTransformationRule(Word.Noun firstNoun, Word.Noun secondNoun) {
+        transformationRules.put(firstNoun, secondNoun);
+    }
+
+    private boolean isOperatorIs(List<List<Cellule>> grid, int i, int j) {
+        return grid.get(i).get(j).containsOperatorIs();
+    }
+
+    /**
+     * Print nounToProperty and propertyToNoun maps
+     */
+    public void printMaps() {
+        System.out.println("Noun to Property Map:");
+        for (Map.Entry<Element, Set<Word.Property>> entry : nounToProperty.entrySet()) {
+            System.out.println(entry.getKey() + " -> " + entry.getValue());
+        }
+
+        System.out.println("\nProperty to Noun Map:");
+        for (Map.Entry<Word.Property, Set<Element>> entry : propertyToNoun.entrySet()) {
+            System.out.println(entry.getKey() + " -> " + entry.getValue());
+        }
+
+        System.out.println("\nTransformation Rules:");
+        for (Map.Entry<Word.Noun, Word.Noun> entry : transformationRules.entrySet()) {
+            System.out.println(entry.getKey() + " IS " + entry.getValue());
+        }
+    }
+
+    /**
+     * Get the entity corresponding to a noun
+     * 
+     * @param noun the noun to get the entity for
+     * @return the corresponding entity
+     */
+    public static Element getEntityByNoun(Word.Noun noun) {
+        switch (noun) {
+            case BABA:
+                return Element.ENTITY_BABA;
+            case FLAG:
+                return Element.ENTITY_FLAG;
+            case WALL:
+                return Element.ENTITY_WALL;
+            case WATER:
+                return Element.ENTITY_WATER;
+            case SKULL:
+                return Element.ENTITY_SKULL;
+            case LAVA:
+                return Element.ENTITY_LAVA;
+            case ROCK:
+                return Element.ENTITY_ROCK;
+            default:
+                throw new IllegalArgumentException("Unknown noun: " + noun);
+        }
+    }
+
+    /**
+     * Get entities by property in a given cell
+     * 
+     * @param cell the cell to check
+     * @param property the property to check
+     * @return the set of entities with the specified property
+     */
+    Set<Element> getEntitiesByProperty(Cellule cell, Word.Property property) {
+        Set<Element> entities = new HashSet<>();
+        Set<Element> propertyEntities = propertyToNoun.get(property);
+        if (propertyEntities != null) {
+            for (Element element : cell.getElements()) {
+                if (propertyEntities.contains(element)) {
+                    entities.add(element);
+                }
+            }
+        }
+        return entities;
+    }
+
+    /**
+     * Get win elements in a given cell
+     * 
+     * @param cell the cell to check
+     * @return the set of elements with the WIN property
+     */
+    public Set<Element> getWinElements(Cellule cell) {
+        return getEntitiesByProperty(cell, Word.Property.WIN);
+    }
+
+    /**
+     * Get pushable elements in a given cell
+     * 
+     * @param cell the cell to check
+     * @return the set of pushable elements
+     */
+    public Set<Element> getPushableElements(Cellule cell) {
+        Set<Element> pushableElements = getEntitiesByProperty(cell, Word.Property.PUSH);
+        for (Element element : cell.getElements()) {
+            if (element.getWord() != null) {
+                pushableElements.add(element); // All words are considered pushable
+            }
+        }
+        return pushableElements;
+    }
+
+    /**
+     * Get stop elements in a given cell
+     * 
+     * @param cell the cell to check
+     * @return the set of elements with the STOP property
+     */
+    public Set<Element> getStopElements(Cellule cell) {
+        return getEntitiesByProperty(cell, Word.Property.STOP);
+    }
+
+    /**
+     * Get BABA elements in a given cell
+     * 
+     * @param cell the cell to check
+     * @return the set of elements with the BABA property
+     */
+    public Set<Element> getBabaElements(Cellule cell) {
+        return getEntitiesByProperty(cell, Word.Property.YOU);
+    }
+
+    /**
+     * Check if a cell contains a WIN element
+     * 
+     * @param cell the cell to check
+     * @return true if the cell contains a WIN element, false otherwise
+     */
+    public boolean isWin(Cellule cell) {
+        return !getWinElements(cell).isEmpty();
+    }
+
+    /**
+     * Get transformation rules
+     * 
+     * @return the transformation rules
+     */
+    public Map<Word.Noun, Word.Noun> getTransformationRules() {
+        return transformationRules;
     }
 }
