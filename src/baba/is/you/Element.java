@@ -8,80 +8,80 @@ public enum Element {
     /**
      * Represents the player character.
      */
-    BABA(Word.Noun.BABA),
+    BABA(Noun.BABA),
     /**
      * Represents the goal object.
      */
-    FLAG(Word.Noun.FLAG),
+    FLAG(Noun.FLAG),
     /**
      * Represents an impassable wall.
      */
-    WALL(Word.Noun.WALL),
+    WALL(Noun.WALL),
     /**
      * Represents a water obstacle.
      */
-    WATER(Word.Noun.WATER),
+    WATER(Noun.WATER),
     /**
      * Represents a deadly obstacle.
      */
-    SKULL(Word.Noun.SKULL),
+    SKULL(Noun.SKULL),
     /**
      * Represents a lava obstacle.
      */
-    LAVA(Word.Noun.LAVA),
+    LAVA(Noun.LAVA),
     /**
      * Represents a movable rock.
      */
-    ROCK(Word.Noun.ROCK),
+    ROCK(Noun.ROCK),
     /**
      * Represents a flower object.
      */
-    FLOWER(Word.Noun.FLOWER),
+    FLOWER(Noun.FLOWER),
     /**
      * Represents a grass object.
      */
-    GRASS(Word.Noun.GRASS),
+    GRASS(Noun.GRASS),
     /**
      * Represents a tile object.
      */
-    TILE(Word.Noun.TILE),
+    TILE(Noun.TILE),
     /**
      * Represents the "IS" operator in rules.
      */
-    IS(Word.Operator.IS),
+    IS(Operator.IS),
 
     /**
      * Represents the "YOU" property in rules.
      */
-    YOU(Word.Property.YOU),
+    YOU(Property.YOU),
     /**
      * Represents the "WIN" property in rules.
      */
-    WIN(Word.Property.WIN),
+    WIN(Property.WIN),
     /**
      * Represents the "STOP" property in rules.
      */
-    STOP(Word.Property.STOP),
+    STOP(Property.STOP),
     /**
      * Represents the "PUSH" property in rules.
      */
-    PUSH(Word.Property.PUSH),
+    PUSH(Property.PUSH),
     /**
      * Represents the "MELT" property in rules.
      */
-    MELT(Word.Property.MELT),
+    MELT(Property.MELT),
     /**
      * Represents the "HOT" property in rules.
      */
-    HOT(Word.Property.HOT),
+    HOT(Property.HOT),
     /**
      * Represents the "DEFEAT" property in rules.
      */
-    DEFEAT(Word.Property.DEFEAT),
+    DEFEAT(Property.DEFEAT),
     /**
      * Represents the "SINK" property in rules.
      */
-    SINK(Word.Property.SINK),
+    SINK(Property.SINK),
 
     /**
      * Represents the player character entity.
@@ -137,7 +137,7 @@ public enum Element {
      *
      * @param noun the noun associated with the element
      */
-    Element(Word.Noun noun) {
+    Element(Noun noun) {
         this.word = new Word(noun);
         this.entity = null;
     }
@@ -147,7 +147,7 @@ public enum Element {
      *
      * @param operator the operator associated with the element
      */
-    Element(Word.Operator operator) {
+    Element(Operator operator) {
         this.word = new Word(operator);
         this.entity = null;
     }
@@ -157,7 +157,7 @@ public enum Element {
      *
      * @param property the property associated with the element
      */
-    Element(Word.Property property) {
+    Element(Property property) {
         this.word = new Word(property);
         this.entity = null;
     }

@@ -4,27 +4,7 @@ package baba.is.you;
  * The Word class represents a word in the game, which can be a noun, an operator, or a property.
  */
 public class Word {
-    /**
-     * Enum representing various nouns in the game.
-     */
-    public enum Noun {
-        BABA, FLAG, WALL, WATER, SKULL, LAVA, ROCK, FLOWER, GRASS, TILE;
-    }
-
-    /**
-     * Enum representing the operator in the game.
-     */
-    public enum Operator {
-        IS;
-    }
-
-    /**
-     * Enum representing various properties in the game.
-     */
-    public enum Property {
-        YOU, WIN, STOP, PUSH, MELT, HOT, DEFEAT, SINK;
-    }
-
+	
     private final Noun noun;
     private final Operator operator;
     private final Property property;

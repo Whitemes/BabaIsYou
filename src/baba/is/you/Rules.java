@@ -4,9 +4,9 @@ import java.util.*;
 
 public class Rules {
     private Level level;
-    private Map<Element, Set<Word.Property>> nounToProperty;
-    private Map<Word.Property, Set<Element>> propertyToNoun;
-    private Map<Word.Noun, Word.Noun> transformationRules;
+    private Map<Element, Set<Property>> nounToProperty;
+    private Map<Property, Set<Element>> propertyToNoun;
+    private Map<Noun, Noun> transformationRules;
 
     /**
      * Constructor for Rules class
@@ -73,7 +73,7 @@ public class Rules {
         return first.hasNoun() && (second.hasProperty() || second.hasNoun());
     }
 
-    private void addRule(Element noun, Word.Property property) {
+    private void addRule(Element noun, Property property) {
         // Add to nounToProperty map
         nounToProperty.computeIfAbsent(noun, k -> new HashSet<>()).add(property);
 
@@ -81,7 +81,7 @@ public class Rules {
         propertyToNoun.computeIfAbsent(property, k -> new HashSet<>()).add(noun);
     }
 
-    private void addTransformationRule(Word.Noun firstNoun, Word.Noun secondNoun) {
+    private void addTransformationRule(Noun firstNoun, Noun secondNoun) {
         transformationRules.put(firstNoun, secondNoun);
     }
 
@@ -94,17 +94,17 @@ public class Rules {
      */
     public void printMaps() {
         System.out.println("Noun to Property Map:");
-        for (Map.Entry<Element, Set<Word.Property>> entry : nounToProperty.entrySet()) {
+        for (Map.Entry<Element, Set<Property>> entry : nounToProperty.entrySet()) {
             System.out.println(entry.getKey() + " -> " + entry.getValue());
         }
 
         System.out.println("\nProperty to Noun Map:");
-        for (Map.Entry<Word.Property, Set<Element>> entry : propertyToNoun.entrySet()) {
+        for (Map.Entry<Property, Set<Element>> entry : propertyToNoun.entrySet()) {
             System.out.println(entry.getKey() + " -> " + entry.getValue());
         }
 
         System.out.println("\nTransformation Rules:");
-        for (Map.Entry<Word.Noun, Word.Noun> entry : transformationRules.entrySet()) {
+        for (Map.Entry<Noun, Noun> entry : transformationRules.entrySet()) {
             System.out.println(entry.getKey() + " IS " + entry.getValue());
         }
     }
@@ -115,7 +115,7 @@ public class Rules {
      * @param noun the noun to get the entity for
      * @return the corresponding entity
      */
-    public static Element getEntityByNoun(Word.Noun noun) {
+    public static Element getEntityByNoun(Noun noun) {
         switch (noun) {
             case BABA:
                 return Element.ENTITY_BABA;
@@ -143,7 +143,7 @@ public class Rules {
      * @param property the property to check
      * @return the set of entities with the specified property
      */
-    Set<Element> getEntitiesByProperty(Cellule cell, Word.Property property) {
+    Set<Element> getEntitiesByProperty(Cellule cell, Property property) {
         Set<Element> entities = new HashSet<>();
         Set<Element> propertyEntities = propertyToNoun.get(property);
         if (propertyEntities != null) {
@@ -163,7 +163,7 @@ public class Rules {
      * @return the set of elements with the WIN property
      */
     public Set<Element> getWinElements(Cellule cell) {
-        return getEntitiesByProperty(cell, Word.Property.WIN);
+        return getEntitiesByProperty(cell, Property.WIN);
     }
 
     /**
@@ -173,7 +173,7 @@ public class Rules {
      * @return the set of pushable elements
      */
     public Set<Element> getPushableElements(Cellule cell) {
-        Set<Element> pushableElements = getEntitiesByProperty(cell, Word.Property.PUSH);
+        Set<Element> pushableElements = getEntitiesByProperty(cell, Property.PUSH);
         for (Element element : cell.getElements()) {
             if (element.getWord() != null) {
                 pushableElements.add(element); // All words are considered pushable
@@ -189,7 +189,7 @@ public class Rules {
      * @return the set of elements with the STOP property
      */
     public Set<Element> getStopElements(Cellule cell) {
-        return getEntitiesByProperty(cell, Word.Property.STOP);
+        return getEntitiesByProperty(cell, Property.STOP);
     }
 
     /**
@@ -199,7 +199,7 @@ public class Rules {
      * @return the set of elements with the BABA property
      */
     public Set<Element> getBabaElements(Cellule cell) {
-        return getEntitiesByProperty(cell, Word.Property.YOU);
+        return getEntitiesByProperty(cell, Property.YOU);
     }
 
     /**
@@ -217,7 +217,7 @@ public class Rules {
      * 
      * @return the transformation rules
      */
-    public Map<Word.Noun, Word.Noun> getTransformationRules() {
+    public Map<Noun, Noun> getTransformationRules() {
         return transformationRules;
     }
 }

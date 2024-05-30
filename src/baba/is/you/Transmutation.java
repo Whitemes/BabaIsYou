@@ -24,8 +24,8 @@ public class Transmutation {
         List<List<Cellule>> grid = level.getGrid();
         for (List<Cellule> row : grid) {
             for (Cellule cell : row) {
-                Set<Element> meltElements = rules.getEntitiesByProperty(cell, Word.Property.MELT);
-                Set<Element> hotElements = rules.getEntitiesByProperty(cell, Word.Property.HOT);
+                Set<Element> meltElements = rules.getEntitiesByProperty(cell, Property.MELT);
+                Set<Element> hotElements = rules.getEntitiesByProperty(cell, Property.HOT);
                 if (!meltElements.isEmpty() && !hotElements.isEmpty()) {
                     for (Element meltElement : meltElements) {
                         cell.removeElement(meltElement);
@@ -42,8 +42,8 @@ public class Transmutation {
         List<List<Cellule>> grid = level.getGrid();
         for (List<Cellule> row : grid) {
             for (Cellule cell : row) {
-                Set<Element> defeatElements = rules.getEntitiesByProperty(cell, Word.Property.DEFEAT);
-                Set<Element> youElements = rules.getEntitiesByProperty(cell, Word.Property.YOU);
+                Set<Element> defeatElements = rules.getEntitiesByProperty(cell, Property.DEFEAT);
+                Set<Element> youElements = rules.getEntitiesByProperty(cell, Property.YOU);
                 if (!defeatElements.isEmpty() && !youElements.isEmpty()) {
                     for (Element youElement : youElements) {
                         cell.removeElement(youElement);
@@ -60,7 +60,7 @@ public class Transmutation {
         List<List<Cellule>> grid = level.getGrid();
         for (List<Cellule> row : grid) {
             for (Cellule cell : row) {
-                Set<Element> sinkElements = rules.getEntitiesByProperty(cell, Word.Property.SINK);
+                Set<Element> sinkElements = rules.getEntitiesByProperty(cell, Property.SINK);
                 if (!sinkElements.isEmpty() && cell.getElements().size() > 2) {
                     cell.getElements().clear();
                     cell.addElement(Element.EMPTY);
@@ -75,7 +75,7 @@ public class Transmutation {
      * @param source the source noun
      * @param dest the destination noun
      */
-    public void applyTransformation(Word.Noun source, Word.Noun dest) {
+    public void applyTransformation(Noun source, Noun dest) {
         List<List<Cellule>> grid = level.getGrid();
         Element sourceElement = Rules.getEntityByNoun(source);
         Element destElement = Rules.getEntityByNoun(dest);

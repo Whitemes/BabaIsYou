@@ -1,5 +1,6 @@
 package baba.is.you;
 
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -60,8 +61,8 @@ public class Level {
     }
 
     private void applyAllTransformations(Transmutation transmutation) {
-        Map<Word.Noun, Word.Noun> transformationRules = rules.getTransformationRules();
-        for (Map.Entry<Word.Noun, Word.Noun> entry : transformationRules.entrySet()) {
+        Map<Noun, Noun> transformationRules = rules.getTransformationRules();
+        for (Map.Entry<Noun, Noun> entry : transformationRules.entrySet()) {
             transmutation.applyTransformation(entry.getKey(), entry.getValue());
         }
     }

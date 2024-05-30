@@ -75,7 +75,7 @@ public class Cellule {
      */
     public boolean containsOperatorIs() {
         for (Element element : elements) {
-            if (element.getWord() != null && element.getWord().getOperator() == Word.Operator.IS) {
+            if (element.getWord() != null && element.getWord().getOperator() == Operator.IS) {
                 return true;
             }
         }
@@ -115,7 +115,7 @@ public class Cellule {
      * 
      * @return the noun if present, otherwise null
      */
-    public Word.Noun getNoun() {
+    public Noun getNoun() {
         for (Element element : elements) {
             if (element.getWord() != null && element.getWord().getNoun() != null) {
                 return element.getWord().getNoun();
@@ -129,7 +129,7 @@ public class Cellule {
      * 
      * @return the property if present, otherwise null
      */
-    public Word.Property getProperty() {
+    public Property getProperty() {
         for (Element element : elements) {
             if (element.getWord() != null && element.getWord().getProperty() != null) {
                 return element.getWord().getProperty();
