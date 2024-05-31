@@ -53,11 +53,11 @@ public class View {
     public static View initGameGraphics(List<List<Cellule>> grid, int height, int width) {
         Objects.requireNonNull(grid, "Grid must not be null");
         int blockSize, xOrigin, yOrigin;
-        int numRows = grid.size();
-        int numCols = grid.get(0).size();
+        var numRows = grid.size();
+        var numCols = grid.get(0).size();
 
-        float rowRatio = (float) height / numRows;
-        float colRatio = (float) width / numCols;
+        var rowRatio = height / numRows;
+        var colRatio = width / numCols;
         blockSize = (int) Math.min(rowRatio, colRatio);
 
         xOrigin = (width - (numCols * blockSize)) / 2;
@@ -144,8 +144,8 @@ public class View {
         graphics.setColor(Color.BLACK);
         graphics.fill(new Rectangle2D.Float(0, 0, width, height));
 
-        for (int i = 0; i < grid.size(); i++) {
-            for (int j = 0; j < grid.get(i).size(); j++) {
+        for (var i = 0; i < grid.size(); i++) {
+            for (var j = 0; j < grid.get(i).size(); j++) {
                 drawCell(graphics, i, j);
             }
         }

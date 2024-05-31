@@ -6,58 +6,61 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Represents a cell in a grid. Each cell can hold multiple elements and provides methods for manipulating these elements.
+ */
 public class Cellule {
     private List<Element> elements;
 
     /**
-     * Constructor for Cellule class.
+     * Constructs an empty Cellule instance.
      */
     public Cellule() {
         this.elements = new ArrayList<>();
     }
 
     /**
-     * Add an element to the cell.
+     * Adds an element to the cell.
      * 
-     * @param element the element to add
+     * @param element the element to be added to the cell
      */
     public void addElement(Element element) {
         elements.add(element);
     }
 
     /**
-     * Remove an element from the cell.
+     * Removes a specified element from the cell.
      * 
-     * @param element the element to remove
+     * @param element the element to be removed from the cell
      */
     public void removeElement(Element element) {
         elements.remove(element);
     }
 
     /**
-     * Get the list of elements in the cell.
+     * Returns a list of all elements currently in the cell.
      * 
-     * @return the list of elements
+     * @return a list containing the elements in the cell
      */
     public List<Element> getElements() {
         return elements;
     }
 
     /**
-     * Check if the cell contains a specific element.
+     * Checks if a specific element is contained in the cell.
      * 
-     * @param element the element to check for
-     * @return true if the cell contains the element, false otherwise
+     * @param element the element to check for in the cell
+     * @return true if the cell contains the element, otherwise false
      */
     public boolean contains(Element element) {
         return elements.contains(element);
     }
 
     /**
-     * Check if the cell contains any element from a set of elements.
+     * Determines whether the cell contains any of the elements in a specified set.
      * 
-     * @param elements the set of elements to check for
-     * @return true if the cell contains any element from the set, false otherwise
+     * @param elements the set of elements to check against the cell's contents
+     * @return true if any element from the set is in the cell, otherwise false
      */
     public boolean containsAny(Set<Element> elements) {
         for (Element element : elements) {
@@ -69,12 +72,12 @@ public class Cellule {
     }
 
     /**
-     * Check if the cell contains an operator 'IS'.
+     * Checks if the cell contains the 'IS' operator.
      * 
-     * @return true if the cell contains an 'IS' operator, false otherwise
+     * @return true if an 'IS' operator is present in the cell, otherwise false
      */
     public boolean containsOperatorIs() {
-        for (Element element : elements) {
+        for (var element : elements) {
             if (element.getWord() != null && element.getWord().getOperator() == Operator.IS) {
                 return true;
             }
@@ -83,12 +86,12 @@ public class Cellule {
     }
 
     /**
-     * Check if the cell contains a noun.
+     * Determines whether the cell contains a noun.
      * 
-     * @return true if the cell contains a noun, false otherwise
+     * @return true if a noun is present in the cell, otherwise false
      */
     public boolean hasNoun() {
-        for (Element element : elements) {
+        for (var element : elements) {
             if (element.getWord() != null && element.getWord().getNoun() != null) {
                 return true;
             }
@@ -97,12 +100,12 @@ public class Cellule {
     }
 
     /**
-     * Check if the cell contains a property.
+     * Checks if the cell contains a property.
      * 
-     * @return true if the cell contains a property, false otherwise
+     * @return true if a property is present in the cell, otherwise false
      */
     public boolean hasProperty() {
-        for (Element element : elements) {
+        for (var element : elements) {
             if (element.getWord() != null && element.getWord().getProperty() != null) {
                 return true;
             }
@@ -111,13 +114,14 @@ public class Cellule {
     }
 
     /**
-     * Get the noun from the cell.
+     * Retrieves a noun from the cell, if present.
      * 
      * @return the noun if present, otherwise null
      */
     public Noun getNoun() {
-        for (Element element : elements) {
+        for (var element : elements) {
             if (element.getWord() != null && element.getWord().getNoun() != null) {
+
                 return element.getWord().getNoun();
             }
         }
@@ -125,12 +129,12 @@ public class Cellule {
     }
 
     /**
-     * Get the property from the cell.
+     * Retrieves a property from the cell, if present.
      * 
      * @return the property if present, otherwise null
      */
     public Property getProperty() {
-        for (Element element : elements) {
+        for (var element : elements) {
             if (element.getWord() != null && element.getWord().getProperty() != null) {
                 return element.getWord().getProperty();
             }
@@ -139,9 +143,9 @@ public class Cellule {
     }
 
     /**
-     * Remove the last element from the cell and return it.
+     * Removes and returns the last element in the cell.
      * 
-     * @return the removed element
+     * @return the last element removed from the cell, or null if the cell is empty
      */
     public Element removeLastElement() {
         if (!elements.isEmpty()) {
@@ -151,19 +155,19 @@ public class Cellule {
     }
 
     /**
-     * Remove elements that are present in the specified set from the cell and return them in a new cell.
+     * Removes elements specified in a set from the cell and returns them in a new cell.
      *
-     * @param elementsToPop the set of elements to remove
+     * @param elementsToPop the set of elements to be removed
      * @return a new cell containing the removed elements
-     * @throws NullPointerException if elementsToPop is null
+     * @throws NullPointerException if the elementsToPop is null
      */
     public Cellule popElements(Set<Element> elementsToPop) {
         Objects.requireNonNull(elementsToPop, "elementsToPop must not be null");
 
-        Cellule poppedElementsCell = new Cellule();
-        Iterator<Element> iterator = elements.iterator();
+        var poppedElementsCell = new Cellule();
+        var iterator = elements.iterator();
         while (iterator.hasNext()) {
-            Element currentElement = iterator.next();
+            var currentElement = iterator.next();
             if (elementsToPop.contains(currentElement)) {
                 poppedElementsCell.addElement(currentElement);
                 iterator.remove();
@@ -173,9 +177,9 @@ public class Cellule {
     }
 
     /**
-     * Check if the cell is empty.
+     * Determines whether the cell is empty.
      * 
-     * @return true if the cell is empty, false otherwise
+     * @return true if there are no elements in the cell, otherwise false
      */
     public boolean isEmpty() {
         return elements.isEmpty();

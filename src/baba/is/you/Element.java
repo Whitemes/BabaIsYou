@@ -138,6 +138,7 @@ public enum Element {
      * @param noun the noun associated with the element
      */
     Element(Noun noun) {
+    	
         this.word = new Word(noun);
         this.entity = null;
     }

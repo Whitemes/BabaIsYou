@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Game {
     private final List<Level> levels;
@@ -46,9 +47,9 @@ public class Game {
      */
     private void playNextLevel() {
         if (currentLevelIndex < levels.size()) {
-            Level level = levels.get(currentLevelIndex);
-            Rules rules = new Rules(level);
-            Transmutation transmutation = new Transmutation(level, rules);
+            var level = levels.get(currentLevelIndex);
+            var rules = new Rules(level);
+            var transmutation = new Transmutation(level, rules);
             view = View.initGameGraphics(level.getGrid(), context.getScreenInfo().height(), context.getScreenInfo().width());
             playLevel(level, rules, transmutation);
         } else {
@@ -81,6 +82,9 @@ public class Game {
      * @param transmutation the transmutation rules applicable to the current level
      */
     private void processInput(Level level, Rules rules, Transmutation transmutation) {
+    	Objects.requireNonNull(level);
+    	Objects.requireNonNull(rules);
+    	Objects.requireNonNull(transmutation);
         var event = context.pollOrWaitEvent(100);
         if (event instanceof KeyboardEvent keyboardEvent && keyboardEvent.action() == KeyboardEvent.Action.KEY_PRESSED) {
             try {
@@ -111,6 +115,7 @@ public class Game {
      * @param level the current level to be checked
      */
     private void checkLevelCompletion(Level level) {
+    	Objects.requireNonNull(level);
         if (level.isCompleted()) {
             currentLevelIndex++;
             playNextLevel();
@@ -131,8 +136,9 @@ public class Game {
      * @return the loaded level
      */
     private Level loadLevel(String path) {
-        List<List<Cellule>> grid = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+    	Objects.requireNonNull(path);
+        var grid = new ArrayList<List<Cellule>>();
+        try (var reader = new BufferedReader(new FileReader(path))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (!line.isEmpty()) {
@@ -152,9 +158,10 @@ public class Game {
      * @return a list of levels
      */
     private List<Level> loadLevels(String directoryPath) {
-        List<Level> levels = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(directoryPath), "*.txt")) {
-            for (Path entry : stream) {
+    	Objects.requireNonNull(directoryPath);
+        var levels = new ArrayList<Level>();
+        try (var stream = Files.newDirectoryStream(Paths.get(directoryPath), "*.txt")) {
+            for (var entry : stream) {
                 levels.add(loadLevel(entry.toString()));
             }
         } catch (IOException e) {
@@ -170,12 +177,13 @@ public class Game {
      * @return a list of cells
      */
     private List<Cellule> parseLineToRow(String line) {
-        List<Cellule> row = new ArrayList<>();
-        String[] tokens = line.split(" ");
-        for (String token : tokens) {
-            Cellule cell = new Cellule();
+    	Objects.requireNonNull(line);
+        var row = new ArrayList<Cellule>();
+        var tokens = line.split(" ");
+        for (var token : tokens) {
+            var cell = new Cellule();
             cell.addElement(Element.EMPTY); // Always add EMPTY element
-            Element element = stringToElement(token);
+            var element = stringToElement(token);
             if (element != null && element != Element.EMPTY) {
                 cell.addElement(element);
             }
@@ -191,7 +199,7 @@ public class Game {
      * @return the corresponding element
      */
     private Element stringToElement(String token) {
-        return elementMap.getOrDefault(token, Element.EMPTY);
+        return elementMap.getOrDefault(Objects.requireNonNull(token), Element.EMPTY);
     }
 
     /**
@@ -200,7 +208,7 @@ public class Game {
      * @return the map of string tokens to elements
      */
     private Map<String, Element> createElementMap() {
-        Map<String, Element> map = new HashMap<>();
+        var map = new HashMap<String, Element>();
         map.put("b", Element.BABA);
         map.put("f", Element.FLAG);
         map.put("w", Element.WALL);
@@ -234,7 +242,7 @@ public class Game {
 
     public static void main(String[] args) {
         Application.run(Color.BLACK, t -> {
-            Game game = new Game("assets/text/levels");
+            var game = new Game("assets/text/levels");
             game.start(t);
         });
     }

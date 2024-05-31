@@ -1,7 +1,6 @@
 package baba.is.you;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -68,7 +67,7 @@ public class ImageLoader {
      */
     private ImageIcon getImage(String imagePath) throws IOException {
         Objects.requireNonNull(imagePath, "imagePath must not be null");
-        URL imageUrl = ImageLoader.class.getResource("/images/" + imagePath);
+        var imageUrl = ImageLoader.class.getResource("/images/" + imagePath);
         if (imageUrl == null) {
             throw new IOException("Image not found at path: /images/" + imagePath);
         }

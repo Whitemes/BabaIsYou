@@ -21,11 +21,11 @@ public class Transmutation {
      * Check and apply melt rules to the grid
      */
     public void checkMelt() {
-        List<List<Cellule>> grid = level.getGrid();
-        for (List<Cellule> row : grid) {
-            for (Cellule cell : row) {
-                Set<Element> meltElements = rules.getEntitiesByProperty(cell, Property.MELT);
-                Set<Element> hotElements = rules.getEntitiesByProperty(cell, Property.HOT);
+       var grid = level.getGrid();
+        for (var row : grid) {
+            for (var cell : row) {
+                var meltElements = rules.getEntitiesByProperty(cell, Property.MELT);
+                var hotElements = rules.getEntitiesByProperty(cell, Property.HOT);
                 if (!meltElements.isEmpty() && !hotElements.isEmpty()) {
                     for (Element meltElement : meltElements) {
                         cell.removeElement(meltElement);
@@ -39,11 +39,11 @@ public class Transmutation {
      * Check and apply defeat rules to the grid
      */
     public void checkDefeat() {
-        List<List<Cellule>> grid = level.getGrid();
-        for (List<Cellule> row : grid) {
-            for (Cellule cell : row) {
-                Set<Element> defeatElements = rules.getEntitiesByProperty(cell, Property.DEFEAT);
-                Set<Element> youElements = rules.getEntitiesByProperty(cell, Property.YOU);
+        var grid = level.getGrid();
+        for (var row : grid) {
+            for (var cell : row) {
+                var defeatElements = rules.getEntitiesByProperty(cell, Property.DEFEAT);
+                var youElements = rules.getEntitiesByProperty(cell, Property.YOU);
                 if (!defeatElements.isEmpty() && !youElements.isEmpty()) {
                     for (Element youElement : youElements) {
                         cell.removeElement(youElement);
@@ -57,10 +57,10 @@ public class Transmutation {
      * Check and apply sink rules to the grid
      */
     public void checkSink() {
-        List<List<Cellule>> grid = level.getGrid();
-        for (List<Cellule> row : grid) {
-            for (Cellule cell : row) {
-                Set<Element> sinkElements = rules.getEntitiesByProperty(cell, Property.SINK);
+        var grid = level.getGrid();
+        for (var row : grid) {
+            for (var cell : row) {
+                var sinkElements = rules.getEntitiesByProperty(cell, Property.SINK);
                 if (!sinkElements.isEmpty() && cell.getElements().size() > 2) {
                     cell.getElements().clear();
                     cell.addElement(Element.EMPTY);
@@ -68,6 +68,9 @@ public class Transmutation {
             }
         }
     }
+    
+    
+    
 
     /**
      * Transform all entities of the source type to the destination type in the grid.
@@ -76,19 +79,19 @@ public class Transmutation {
      * @param dest the destination noun
      */
     public void applyTransformation(Noun source, Noun dest) {
-        List<List<Cellule>> grid = level.getGrid();
-        Element sourceElement = Rules.getEntityByNoun(source);
-        Element destElement = Rules.getEntityByNoun(dest);
+        var grid = level.getGrid();
+        var sourceElement = Rules.getEntityByNoun(source);
+        var destElement = Rules.getEntityByNoun(dest);
 
-        for (List<Cellule> row : grid) {
-            for (Cellule cell : row) {
-                List<Element> elementsToTransform = new ArrayList<>();
-                for (Element element : cell.getElements()) {
+        for (var row : grid) {
+            for (var cell : row) {
+                var elementsToTransform = new ArrayList<Element>();
+                for (var element : cell.getElements()) {
                     if (element.getEntity() != null && element == sourceElement) {
                         elementsToTransform.add(element);
                     }
                 }
-                for (Element element : elementsToTransform) {
+                for (var element : elementsToTransform) {
                     cell.removeElement(element);
                     cell.addElement(destElement);
                 }

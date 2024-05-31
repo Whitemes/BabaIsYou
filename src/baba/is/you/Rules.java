@@ -3,7 +3,7 @@ package baba.is.you;
 import java.util.*;
 
 public class Rules {
-    private Level level;
+    //private Level level;
     private Map<Element, Set<Property>> nounToProperty;
     private Map<Property, Set<Element>> propertyToNoun;
     private Map<Noun, Noun> transformationRules;
@@ -14,7 +14,7 @@ public class Rules {
      * @param level the current game level
      */
     public Rules(Level level) {
-        this.level = level;
+        //this.level = level;
         this.nounToProperty = new HashMap<>();
         this.propertyToNoun = new HashMap<>();
         this.transformationRules = new HashMap<>();
@@ -30,9 +30,9 @@ public class Rules {
         nounToProperty.clear();
         propertyToNoun.clear();
         transformationRules.clear();
-        List<List<Cellule>> grid = level.getGrid();
-        for (int i = 0; i < grid.size(); i++) {
-            for (int j = 0; j < grid.get(i).size(); j++) {
+        var grid = level.getGrid();
+        for (var i = 0; i < grid.size(); i++) {
+            for (var j = 0; j < grid.get(i).size(); j++) {
                 if (isOperatorIs(grid, i, j)) {
                     checkVerticalRules(grid, i, j);
                     checkHorizontalRules(grid, i, j);
@@ -43,8 +43,8 @@ public class Rules {
 
     private void checkVerticalRules(List<List<Cellule>> grid, int i, int j) {
         if (i > 0 && i < grid.size() - 1) {
-            Cellule above = grid.get(i - 1).get(j);
-            Cellule below = grid.get(i + 1).get(j);
+            var above = grid.get(i - 1).get(j);
+            var below = grid.get(i + 1).get(j);
             if (isValidRule(above, below)) {
                 if (above.hasNoun() && below.hasNoun()) {
                     addTransformationRule(above.getNoun(), below.getNoun());
@@ -57,8 +57,8 @@ public class Rules {
 
     private void checkHorizontalRules(List<List<Cellule>> grid, int i, int j) {
         if (j > 0 && j < grid.get(i).size() - 1) {
-            Cellule left = grid.get(i).get(j - 1);
-            Cellule right = grid.get(i).get(j + 1);
+            var left = grid.get(i).get(j - 1);
+            var right = grid.get(i).get(j + 1);
             if (isValidRule(left, right)) {
                 if (left.hasNoun() && right.hasNoun()) {
                     addTransformationRule(left.getNoun(), right.getNoun());
@@ -94,17 +94,17 @@ public class Rules {
      */
     public void printMaps() {
         System.out.println("Noun to Property Map:");
-        for (Map.Entry<Element, Set<Property>> entry : nounToProperty.entrySet()) {
+        for (var entry : nounToProperty.entrySet()) {
             System.out.println(entry.getKey() + " -> " + entry.getValue());
         }
 
         System.out.println("\nProperty to Noun Map:");
-        for (Map.Entry<Property, Set<Element>> entry : propertyToNoun.entrySet()) {
+        for (var entry : propertyToNoun.entrySet()) {
             System.out.println(entry.getKey() + " -> " + entry.getValue());
         }
 
         System.out.println("\nTransformation Rules:");
-        for (Map.Entry<Noun, Noun> entry : transformationRules.entrySet()) {
+        for (var entry : transformationRules.entrySet()) {
             System.out.println(entry.getKey() + " IS " + entry.getValue());
         }
     }
@@ -144,10 +144,10 @@ public class Rules {
      * @return the set of entities with the specified property
      */
     Set<Element> getEntitiesByProperty(Cellule cell, Property property) {
-        Set<Element> entities = new HashSet<>();
-        Set<Element> propertyEntities = propertyToNoun.get(property);
+        var entities = new HashSet<Element>();
+        var propertyEntities = propertyToNoun.get(property);
         if (propertyEntities != null) {
-            for (Element element : cell.getElements()) {
+            for (var element : cell.getElements()) {
                 if (propertyEntities.contains(element)) {
                     entities.add(element);
                 }
@@ -173,8 +173,8 @@ public class Rules {
      * @return the set of pushable elements
      */
     public Set<Element> getPushableElements(Cellule cell) {
-        Set<Element> pushableElements = getEntitiesByProperty(cell, Property.PUSH);
-        for (Element element : cell.getElements()) {
+        var pushableElements = getEntitiesByProperty(cell, Property.PUSH);
+        for (var element : cell.getElements()) {
             if (element.getWord() != null) {
                 pushableElements.add(element); // All words are considered pushable
             }
