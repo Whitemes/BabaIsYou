@@ -148,6 +148,7 @@ public class View {
             for (var j = 0; j < grid.get(i).size(); j++) {
                 drawCell(graphics, i, j);
             }
+            
         }
     }
 
