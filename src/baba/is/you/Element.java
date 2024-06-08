@@ -199,31 +199,5 @@ public enum Element {
     public boolean isProperty() {
         return this.entity == null && this.word != null && this.word.getProperty() != null;
     }
-
-    /**
-     * Returns a string representation of the element.
-     *
-     * @return the string representation of the element
-     */
-    @Override
-    public String toString() {
-        if (word != null) {
-            return word.toString().substring(0, 1).toLowerCase();
-        }
-        return "?";
-//        switch (this) {
-//            case ENTITY_BABA: return "B";
-//            case ENTITY_FLAG: return "F";
-//            case ENTITY_WALL: return "W";
-//            case ENTITY_WATER: return "A";
-//            case ENTITY_SKULL: return "S";
-//            case ENTITY_LAVA: return "L";
-//            case ENTITY_ROCK: return "R";
-//            case EMPTY: return "-";
-//            case ENTITY_FLOWER: return "o";
-//            case ENTITY_GRASS: return "g";
-//            case ENTITY_TILE: return "J";
-//            default: return "?";
-//        }
-    }
+ 
 }
