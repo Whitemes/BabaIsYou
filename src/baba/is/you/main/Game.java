@@ -222,7 +222,7 @@ public class Game {
         map.put("t", Element.STOP);
         map.put("p", Element.PUSH);
         map.put("m", Element.MELT);
-        map.put("x", Element.HOT);
+        map.put("h", Element.HOT);
         map.put("d", Element.DEFEAT);
         map.put("k", Element.SINK);
         map.put("B", Element.ENTITY_BABA);
