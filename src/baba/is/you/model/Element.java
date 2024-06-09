@@ -1,4 +1,4 @@
-package baba.is.you;
+package baba.is.you.model;
 
 /**
  * The Element enum represents various elements in the game.

@@ -1,4 +1,4 @@
-package baba.is.you;
+package baba.is.you.model;
 
 /**
  * The Entity enum represents the different types of entities in the game.

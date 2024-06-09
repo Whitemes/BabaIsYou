@@ -1,4 +1,4 @@
-package baba.is.you;
+package baba.is.you.model;
 
 /**
  * The Word class represents a word in the game, which can be a noun, an operator, or a property.

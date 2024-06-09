@@ -1,4 +1,4 @@
-package baba.is.you;
+package baba.is.you.model;
 
 /**
  * The Noun enum represents various noun elements in the game.

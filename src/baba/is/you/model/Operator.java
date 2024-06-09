@@ -1,4 +1,4 @@
-package baba.is.you;
+package baba.is.you.model;
 
 /**
  * The Operator enum represents the various operators in the game.

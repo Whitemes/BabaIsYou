@@ -1,4 +1,4 @@
-package baba.is.you;
+package baba.is.you.model;
 
 
 import java.util.HashSet;
@@ -112,7 +112,7 @@ public class Level {
             var nextX = newX + dx;
             var nextY = newY + dy;
             if (isWithinBounds(nextX, nextY) && pushRecursive(newX, newY, nextX, nextY)) {
-                var poppedElements = targetCell.popElements(pushableElements); // Use popElements to move elements
+                var poppedElements = targetCell.popElements(pushableElements);
                 grid.get(nextX).get(nextY).getElements().addAll(poppedElements.getElements());
                 return true;
             } else {

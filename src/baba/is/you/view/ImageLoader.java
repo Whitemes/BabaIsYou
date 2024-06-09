@@ -1,10 +1,12 @@
-package baba.is.you;
+package baba.is.you.view;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import javax.swing.ImageIcon;
+
+import baba.is.you.model.Element;
 
 /**
  * The Images class is responsible for loading and managing images for the game elements.

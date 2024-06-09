@@ -1,4 +1,4 @@
-package baba.is.you;
+package baba.is.you.view;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Objects;
 import javax.swing.ImageIcon;
 import com.github.forax.zen.ApplicationContext;
+
+import baba.is.you.model.Cellule;
 
 /**
  * The View class handles the graphical representation of the game board.

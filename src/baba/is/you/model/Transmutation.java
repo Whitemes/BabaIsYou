@@ -1,4 +1,4 @@
-package baba.is.you;
+package baba.is.you.model;
 
 import java.util.*;
 

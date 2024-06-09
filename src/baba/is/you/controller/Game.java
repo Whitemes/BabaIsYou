@@ -1,6 +1,13 @@
-package baba.is.you.main;
+package baba.is.you.controller;
 
-import baba.is.you.*;
+import baba.is.you.model.Cellule;
+import baba.is.you.model.Direction;
+import baba.is.you.model.Element;
+import baba.is.you.model.Level;
+import baba.is.you.model.Rules;
+import baba.is.you.model.Transmutation;
+import baba.is.you.view.View;
+
 import com.github.forax.zen.Application;
 import com.github.forax.zen.ApplicationContext;
 import com.github.forax.zen.KeyboardEvent;
@@ -232,6 +239,7 @@ public class Game {
         map.put("S", Element.ENTITY_SKULL);
         map.put("L", Element.ENTITY_LAVA);
         map.put("R", Element.ENTITY_ROCK);
+        map.put("G", Element.ENTITY_GRASS);
         map.put("-", Element.EMPTY);
         map.put("o", Element.FLOWER);
         map.put("g", Element.GRASS);
