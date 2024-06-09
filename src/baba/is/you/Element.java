@@ -200,17 +200,16 @@ public enum Element {
         return this.entity == null && this.word != null && this.word.getProperty() != null;
     }
 
-    /**
-     * Returns a string representation of the element.
-     *
-     * @return the string representation of the element
-     */
-    @Override
-    public String toString() {
-        if (word != null) {
-            return word.toString().substring(0, 1).toLowerCase();
-        }
-        return "?";
+//    /**
+//     * Returns a string representation of the element.
+//     *
+//     * @return the string representation of the element
+//     */
+//    @Override
+//    public String toString() {
+//        if (word != null) {
+//            return word.toString().substring(0, 1).toLowerCase();
+//        }
 //        switch (this) {
 //            case ENTITY_BABA: return "B";
 //            case ENTITY_FLAG: return "F";
@@ -225,5 +224,5 @@ public enum Element {
 //            case ENTITY_TILE: return "J";
 //            default: return "?";
 //        }
-    }
+//    }
 }
