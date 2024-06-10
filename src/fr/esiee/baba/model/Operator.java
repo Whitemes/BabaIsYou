@@ -1,4 +1,4 @@
-package baba.is.you.model;
+package fr.esiee.baba.model;
 
 /**
  * The Operator enum represents the various operators used in "BABA IS YOU" to form gameplay rules.

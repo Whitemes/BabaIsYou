@@ -1,4 +1,4 @@
-package baba.is.you.view;
+package fr.esiee.baba.view;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -9,7 +9,7 @@ import java.util.Objects;
 import javax.swing.ImageIcon;
 import com.github.forax.zen.ApplicationContext;
 
-import baba.is.you.model.Cellule;
+import fr.esiee.baba.model.Cellule;
 
 /**
  * Manages the graphical display of the game board in "BABA IS YOU".

@@ -1,4 +1,4 @@
-package baba.is.you.model;
+package fr.esiee.baba.model;
 
 /**
  * The Property enum represents various properties that elements in the game "BABA IS YOU" can possess.

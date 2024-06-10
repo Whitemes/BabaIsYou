@@ -1,4 +1,4 @@
-package baba.is.you.model;
+package fr.esiee.baba.model;
 
 /**
  * The Word class encapsulates the concept of words used in the game "BABA IS YOU",

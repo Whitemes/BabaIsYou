@@ -1,4 +1,4 @@
-package baba.is.you.model;
+package fr.esiee.baba.model;
 
 import java.util.*;
 

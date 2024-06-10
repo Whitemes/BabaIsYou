@@ -1,12 +1,12 @@
-package baba.is.you.controller;
+package fr.esiee.baba.controller;
 
-import baba.is.you.model.Cellule;
-import baba.is.you.model.Direction;
-import baba.is.you.model.Element;
-import baba.is.you.model.Level;
-import baba.is.you.model.Rules;
-import baba.is.you.model.Transmutation;
-import baba.is.you.view.View;
+import fr.esiee.baba.model.Cellule;
+import fr.esiee.baba.model.Direction;
+import fr.esiee.baba.model.Element;
+import fr.esiee.baba.model.Level;
+import fr.esiee.baba.model.Rules;
+import fr.esiee.baba.model.Transmutation;
+import fr.esiee.baba.view.View;
 
 import com.github.forax.zen.Application;
 import com.github.forax.zen.ApplicationContext;

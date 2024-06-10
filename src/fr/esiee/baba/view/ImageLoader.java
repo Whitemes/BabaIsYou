@@ -1,4 +1,4 @@
-package baba.is.you.view;
+package fr.esiee.baba.view;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import javax.swing.ImageIcon;
 
-import baba.is.you.model.Element;
+import fr.esiee.baba.model.Element;
 
 /**
  * Manages the loading and storage of image icons for game elements in "BABA IS YOU".

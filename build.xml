@@ -7,9 +7,9 @@
     <property name="src.dir"     value="src"/>
     <property name="classes.dir" value="classes"/>
 	<property name="lib.dir" location="lib"/>
-	<property name="build.dir"     value="build"/>
+	<property name="dist.dir"     value="dist"/>
     <property name="docs.dir"    value="docs/doc"/>
-    <property name="bin.dir"    value="bin"/>
+
 
     <!-- Define the classpath -->
     <path id="classpath">
@@ -18,23 +18,23 @@
 
     <!-- Initialize directory structure -->
     <target name="init">
-        <mkdir dir="${build.dir}"/>
-        <mkdir dir="${build.dir}/${classes.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${classes.dir}"/>
         <mkdir dir="${docs.dir}"/>
     </target>
 
     <!-- Compile the source code -->
     <target name="compile" depends="init">
-        <javac srcdir="${src.dir}" destdir="${classes.dir}/${classes.dir}" includeantruntime="false">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false">
             <classpath refid="classpath"/>
         </javac>
     </target>
 
     <!-- Create the executable JAR -->
     <target name="jar" depends="compile">
-        <jar destfile="${build.dir}/baba.jar" basedir="${classes.dir}">
-            <manifest>
-                <attribute name="Main-Class" value="baba.is.you.controller.Game"/>
+        <jar destfile="${dist.dir}/baba.jar" basedir="${classes.dir}">
+            <manifest file="MANIFEST.MF">
+                <attribute name="Main-Class" value="fr.esiee.baba.controller.Game"/>
                 <attribute name="Class-Path" value="lib/zen-6.0.jar"/>
             </manifest>
         </jar>
@@ -50,14 +50,13 @@
 
     <!-- Clean up build artifacts -->
     <target name="clean">
-        <delete dir="${build.dir}"/>
-        <delete dir="${docs.dir}"/>
+        <delete dir="${dist.dir}"/>
     	<delete dir="${classes.dir}"/>
-    	<delete dir="${bin.dir}"/>
+        <delete dir="${docs.dir}"/>
     </target>
 
     <!-- Default target to do everything -->
-    <target name="all" depends="compile, jar, javadoc">
+    <target name="all" depends="clean, compile, jar, javadoc">
     </target>
 
 </project>

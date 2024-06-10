@@ -1,10 +1,9 @@
-package baba.is.you.model;
+package fr.esiee.baba.model;
 
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
 
 /**
  * Manages a single game level in "BABA IS YOU", including the game grid, rules, and game state.
@@ -206,26 +205,4 @@ public class Level {
         return completed;
     }
 
-    /**
-     * Inner class to manage the movement of entities within the level grid.
-     * This class holds coordinate and direction information for entity movements.
-     */
-    private static class EntityMove {
-        int x, y, dx, dy;
-        
-        /**
-         * Constructor for creating a movement directive for an entity.
-         *
-         * @param x the initial x-coordinate of the entity
-         * @param y the initial y-coordinate of the entity
-         * @param dx the x-direction increment (left or right)
-         * @param dy the y-direction increment (up or down)
-         */
-        EntityMove(int x, int y, int dx, int dy) {
-            this.x = x;
-            this.y = y;
-            this.dx = dx;
-            this.dy = dy;
-        }
-    }
 }

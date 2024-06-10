@@ -1,4 +1,4 @@
-package baba.is.you.model;
+package fr.esiee.baba.model;
 
 /**
  * The Element enum represents various elements in the game "BABA IS YOU".

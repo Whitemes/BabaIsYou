@@ -1,4 +1,4 @@
-package baba.is.you.model;
+package fr.esiee.baba.model;
 
 /**
  * The Direction enum represents the four cardinal directions (UP, DOWN, LEFT, RIGHT).
