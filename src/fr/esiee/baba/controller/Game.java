@@ -1,13 +1,7 @@
 package fr.esiee.baba.controller;
 
-import fr.esiee.baba.model.Cellule;
-import fr.esiee.baba.model.Direction;
-import fr.esiee.baba.model.Element;
-import fr.esiee.baba.model.Level;
-import fr.esiee.baba.model.Rules;
-import fr.esiee.baba.model.Transmutation;
+import fr.esiee.baba.model.*;
 import fr.esiee.baba.view.View;
-
 import com.github.forax.zen.Application;
 import com.github.forax.zen.ApplicationContext;
 import com.github.forax.zen.KeyboardEvent;
@@ -17,11 +11,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Controls the overall game flow and interactions for the "BABA IS YOU" game.
@@ -42,6 +32,18 @@ public class Game {
     public Game(String levelDirectoryPath) {
         this.elementMap = createElementMap();
         this.levels = loadLevels(levelDirectoryPath);
+        this.currentLevelIndex = 0;
+    }
+
+    /**
+     * Constructs a Game instance by loading a single level.
+     *
+     * @param levelFilePath the path to the level file.
+     */
+    public Game(String levelFilePath, boolean isSingleLevel) {
+        this.elementMap = createElementMap();
+        this.levels = new ArrayList<>();
+        this.levels.add(loadLevel(levelFilePath));
         this.currentLevelIndex = 0;
     }
 
@@ -96,9 +98,6 @@ public class Game {
      * @param transmutation the transmutation operations to perform after rule application.
      */
     private void processInput(Level level, Rules rules, Transmutation transmutation) {
-    	Objects.requireNonNull(level);
-    	Objects.requireNonNull(rules);
-    	Objects.requireNonNull(transmutation);
         var event = context.pollOrWaitEvent(100);
         if (event instanceof KeyboardEvent keyboardEvent && keyboardEvent.action() == KeyboardEvent.Action.KEY_PRESSED) {
             try {
@@ -113,7 +112,8 @@ public class Game {
                     case DOWN -> Direction.DOWN;
                     default -> throw new IllegalArgumentException("Invalid key");
                 };
-                level.update(direction);
+                boolean isJump = rules.hasProperty(level.getYouElements(), Property.JUMP);
+                level.update(direction, isJump);
                 rules.initRules(level);
                 transmutation.setTransmutation(level, rules);
                 checkLevelCompletion(level);
@@ -122,6 +122,47 @@ public class Game {
             }
         }
     }
+    
+//    /**
+//     * Processes input events within the game, handling player actions based on different types of input events.
+//     * Currently, it supports keyboard events for player controls.
+//     *
+//     * @param level the current level of the game where the action takes place.
+//     * @param rules the set of rules governing the game mechanics.
+//     * @param transmutation the mechanism to apply rule-based transformations.
+//     */
+//    private void processInput(Level level, Rules rules, Transmutation transmutation) {
+//        var event = context.pollOrWaitEvent(100); 
+//        switch (event) {
+//            case KeyboardEvent keyboardEvent -> {
+//            	 if (keyboardEvent.action() == KeyboardEvent.Action.KEY_PRESSED) {
+//                     try {
+//                         Direction direction = switch (keyboardEvent.key()) {
+//                             case LEFT -> Direction.LEFT;
+//                             case RIGHT -> Direction.RIGHT;
+//                             case UP -> Direction.UP;
+//                             case DOWN -> Direction.DOWN;
+//                             default -> throw new IllegalArgumentException("Invalid key");
+//                         };
+//
+//                         boolean isJump = rules.hasProperty(level.getYouElements(), Property.JUMP);
+//                         level.update(direction, isJump);
+//                         rules.initRules(level);
+//                         transmutation.setTransmutation(level, rules);
+//                         checkLevelCompletion(level);
+//                     } catch (IllegalArgumentException e) {
+//                         System.out.println("Invalid move. Use arrow keys for directions.");
+//                     }
+//                     
+//                     if (keyboardEvent.key() == KeyboardEvent.Key.ESCAPE) {
+//                         System.out.println("Game exited.");
+//                         System.exit(0);
+//                     }
+//                 }
+//            }
+//            default -> {}
+//        }
+//    }
 
     /**
      * Checks if the current level has been completed and advances to the next level if so.
@@ -129,7 +170,6 @@ public class Game {
      * @param level the level to check for completion.
      */
     private void checkLevelCompletion(Level level) {
-    	Objects.requireNonNull(level);
         if (level.isCompleted()) {
             currentLevelIndex++;
             playNextLevel();
@@ -150,7 +190,6 @@ public class Game {
      * @return the loaded level
      */
     private Level loadLevel(String path) {
-    	Objects.requireNonNull(path);
         var grid = new ArrayList<List<Cellule>>();
         try (var reader = new BufferedReader(new FileReader(path))) {
             String line;
@@ -162,7 +201,7 @@ public class Game {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new Level(grid);
+        return new Level(grid, path);
     }
 
     /**
@@ -173,7 +212,6 @@ public class Game {
      * @return a list of loaded levels.
      */
     private List<Level> loadLevels(String directoryPath) {
-    	Objects.requireNonNull(directoryPath);
         var levels = new ArrayList<Level>();
         try (var stream = Files.newDirectoryStream(Paths.get(directoryPath), "*.txt")) {
             for (var entry : stream) {
@@ -192,7 +230,6 @@ public class Game {
      * @return a list of cells parsed from the line.
      */
     private List<Cellule> parseLineToRow(String line) {
-    	Objects.requireNonNull(line);
         var row = new ArrayList<Cellule>();
         var tokens = line.split(" ");
         for (var token : tokens) {
@@ -214,7 +251,7 @@ public class Game {
      * @return the corresponding game element.
      */
     private Element stringToElement(String token) {
-        return elementMap.getOrDefault(Objects.requireNonNull(token), Element.EMPTY);
+        return elementMap.getOrDefault(token, Element.EMPTY);
     }
 
     /**
@@ -241,6 +278,8 @@ public class Game {
         map.put("h", Element.HOT);
         map.put("d", Element.DEFEAT);
         map.put("k", Element.SINK);
+        map.put("n", Element.SMILEY);
+        map.put("u", Element.JUMP);
         map.put("B", Element.ENTITY_BABA);
         map.put("F", Element.ENTITY_FLAG);
         map.put("W", Element.ENTITY_WALL);
@@ -249,6 +288,7 @@ public class Game {
         map.put("L", Element.ENTITY_LAVA);
         map.put("R", Element.ENTITY_ROCK);
         map.put("G", Element.ENTITY_GRASS);
+        map.put("x", Element.ENTITY_SMILEY);
         map.put("-", Element.EMPTY);
         map.put("o", Element.FLOWER);
         map.put("g", Element.GRASS);
@@ -258,14 +298,55 @@ public class Game {
     }
 
     /**
-     * Entry point for running the game application.
+     * The main entry point of the application, which parses command-line arguments to configure and launch the game.
+     * This method supports launching the game with specific levels or directories specified, and executing additional
+     * rules based on the command-line inputs.
      *
-     * @param args the command-line arguments, not used in this application.
+     * The command-line arguments can specify a single level file, a directory of levels, or a default level that is 
+     * used if no specific level or directory is provided. Additionally, it supports executing custom rules
+     * that are applied at the start of the game.
+     *
+     * @param args the command-line arguments used to control game configuration. Supported options include:
+     *             --level [path] : Specifies the path to a single level file to load.
+     *             --levels [directory] : Specifies a directory from which to load all levels.
+     *             --execute [element1 IS element2] : Applies a custom rule, where element1 and element2
+     *                                               are specified elements to create a dynamic rule at runtime.
+     * 
+     * Example:
+     *   java -jar baba.jar --level "path/to/level.txt" : Loads and starts the game using the specified level file.
+     *   java -jar baba.jar --levels "path/to/levels/" : Loads all levels from the specified directory.
+     *   java -jar baba.jar --execute "Rock IS Win" : Applies the rule that turns all rocks into a winning condition.
      */
     public static void main(String[] args) {
+        var options = CommandLineParser.parse(args);
+        Game game = null;
+
+        if (options.containsKey("--level")) {
+            var levelPath = options.get("--level").get(0).get(0);
+            game = new Game(levelPath, true);
+        } else if (options.containsKey("--levels")) {
+            var levelDirectory = options.get("--levels").get(0).get(0);
+            game = new Game(levelDirectory);
+        } else {
+            var defaultLevelPath = Paths.get("resources", "text", "defaultLevel", "default-level.txt").toAbsolutePath().toString();
+            game = new Game(defaultLevelPath, true);
+        }
+
+        Game finalGame = game;
         Application.run(Color.BLACK, t -> {
-            var game = new Game("resources/text/levels");
-            game.start(t);
+            finalGame.start(t);
+
+            if (options.containsKey("--execute")) {
+                for (var executeArgs : options.get("--execute")) {
+                    var rules = new Rules(null);
+                    rules.addRule(
+                            finalGame.stringToElement(executeArgs.get(0)),
+                            Element.IS,
+                            finalGame.stringToElement(executeArgs.get(2))
+                    );
+                }
+            }
         });
     }
+
 }

@@ -24,7 +24,7 @@ public class Cellule {
      * @param element the element to be added to the cell; must not be null.
      */
     public void addElement(Element element) {
-        elements.add(element);
+        elements.add(Objects.requireNonNull(element));
     }
 
     /**
@@ -33,7 +33,7 @@ public class Cellule {
      * @param element the element to be removed from the cell; does nothing if element is not found.
      */
     public void removeElement(Element element) {
-        elements.remove(element);
+        elements.remove(Objects.requireNonNull(element));
     }
 
     /**

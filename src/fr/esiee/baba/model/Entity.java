@@ -48,5 +48,10 @@ public enum Entity {
     /**
      * Represents a tile object.
      */
-    TILE;
+    TILE,
+    
+    /**
+     * Represents a smiley object.
+     */
+    SMILEY;
 }

@@ -53,6 +53,14 @@ public enum Direction {
     public int getDy() {
         return dy;
     }
+    
+    public int getJumpDx() { // Add this method
+        return 2 * dx;
+    }
+
+    public int getJumpDy() { // Add this method
+        return 2 * dy;
+    }
 
     /**
      * Obtains the direction corresponding to a character input.

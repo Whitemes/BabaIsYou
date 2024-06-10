@@ -37,5 +37,9 @@ public enum Property {
     /**
      * The SINK property, indicating an element that sinks when it shares a cell with another element.
      */
-    SINK;
+    SINK,
+    /**
+     * The JUMP property, the element can Jump.
+     */
+    JUMP;
 }

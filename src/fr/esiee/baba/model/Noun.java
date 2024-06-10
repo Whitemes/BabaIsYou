@@ -45,5 +45,9 @@ public enum Noun {
     /**
      * Represents the TILE element.
      */
-    TILE;
+    TILE,
+    /**
+     * Represents the TILE element.
+     */
+    SMILEY;
 }

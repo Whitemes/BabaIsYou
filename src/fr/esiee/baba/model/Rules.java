@@ -2,14 +2,12 @@ package fr.esiee.baba.model;
 
 import java.util.*;
 
-
 /**
  * Manages and evaluates the rules that dictate the interactions and behaviors of elements
  * within the level in "BABA IS YOU". This class maps nouns to properties, properties to nouns,
  * and handles transformations and other dynamic changes in the game state.
  */
 public class Rules {
-    //private Level level;
     private Map<Element, Set<Property>> nounToProperty;
     private Map<Property, Set<Element>> propertyToNoun;
     private Map<Noun, Noun> transformationRules;
@@ -20,7 +18,6 @@ public class Rules {
      * @param level the game level associated with these rules, used to initialize rule mappings based on the level's grid.
      */
     public Rules(Level level) {
-        //this.level = level;
         this.nounToProperty = new HashMap<>();
         this.propertyToNoun = new HashMap<>();
         this.transformationRules = new HashMap<>();
@@ -108,10 +105,7 @@ public class Rules {
      * @param property the property that is to be assigned to the noun.
      */
     private void addRule(Element noun, Property property) {
-        // Add to nounToProperty map
         nounToProperty.computeIfAbsent(noun, k -> new HashSet<>()).add(property);
-
-        // Add to propertyToNoun map
         propertyToNoun.computeIfAbsent(property, k -> new HashSet<>()).add(noun);
     }
 
@@ -123,6 +117,31 @@ public class Rules {
      */
     private void addTransformationRule(Noun firstNoun, Noun secondNoun) {
         transformationRules.put(firstNoun, secondNoun);
+    }
+
+    /**
+     * Adds a rule based on three elements where the middle element is always the operator 'IS'.
+     *
+     * @param first the first element (noun)
+     * @param second the second element (operator 'IS')
+     * @param third the third element (noun or property)
+     */
+    public void addRule(Element first, Element second, Element third) {
+        if (second != Element.IS) {
+            throw new IllegalArgumentException("The second element must be the operator IS.");
+        }
+
+        if (first.getWord() != null && third.getWord() != null) {
+            if (third.getWord().getProperty() != null) {
+                addRule(first, third.getWord().getProperty());
+            } else if (third.getWord().getNoun() != null) {
+                addTransformationRule(first.getWord().getNoun(), third.getWord().getNoun());
+            } else {
+                throw new IllegalArgumentException("The third element must be a noun or property.");
+            }
+        } else {
+            throw new IllegalArgumentException("The first and third elements must be words.");
+        }
     }
 
     /**
@@ -181,6 +200,8 @@ public class Rules {
                 return Element.ENTITY_LAVA;
             case ROCK:
                 return Element.ENTITY_ROCK;
+            case SMILEY:
+            	return Element.ENTITY_SMILEY;
             default:
                 throw new IllegalArgumentException("Unknown noun: " + noun);
         }
@@ -253,6 +274,16 @@ public class Rules {
     }
 
     /**
+     * Retrieves the set of elements in a cell designated as "JUMP", indicating elements that can jump.
+     * 
+     * @param cell the cell to check for elements that can jump.
+     * @return a set of elements with the JUMP property.
+     */
+    public Set<Element> getJumpElements(Cellule cell) {
+        return getEntitiesByProperty(cell, Property.JUMP);
+    }
+
+    /**
      * Determines if the specified cell contains an element that can lead to winning the game.
      * 
      * @param cell the cell to check for a winning condition.
@@ -269,5 +300,21 @@ public class Rules {
      */
     public Map<Noun, Noun> getTransformationRules() {
         return transformationRules;
+    }
+
+    /**
+     * Checks if a given set of elements has a specific property.
+     * 
+     * @param elements the set of elements to check.
+     * @param property the property to check for.
+     * @return true if any of the elements have the property, false otherwise.
+     */
+    public boolean hasProperty(Set<Element> elements, Property property) {
+        for (Element element : elements) {
+            if (nounToProperty.getOrDefault(element, Collections.emptySet()).contains(property)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

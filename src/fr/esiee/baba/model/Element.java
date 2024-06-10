@@ -1,5 +1,7 @@
 package fr.esiee.baba.model;
 
+import java.util.Objects;
+
 /**
  * The Element enum represents various elements in the game "BABA IS YOU".
  * Each element can be either a game entity, a rule word (noun, operator, or property), or a combination thereof.
@@ -47,6 +49,10 @@ public enum Element {
      */
     TILE(Noun.TILE),
     /**
+     * Represents a Smiley object.
+     */
+    SMILEY(Noun.SMILEY),
+    /**
      * Represents the "IS" operator in rules.
      */
     IS(Operator.IS),
@@ -83,6 +89,11 @@ public enum Element {
      * Represents the "SINK" property in rules.
      */
     SINK(Property.SINK),
+
+    /**
+     * Represents the "JUMP" property in rules.
+     */
+    JUMP(Property.JUMP),
 
     /**
      * Represents the player character entity.
@@ -126,6 +137,11 @@ public enum Element {
     ENTITY_TILE(Entity.TILE),
 
     /**
+     * Represents a tile entity.
+     */
+    ENTITY_SMILEY(Entity.SMILEY),
+    
+    /**
      * Represents an empty space entity.
      */
     EMPTY(Entity.EMPTY);
@@ -139,7 +155,7 @@ public enum Element {
      * @param operator the associated operator
      */
     Element(Noun noun) {
-    	
+    	Objects.requireNonNull(noun);
         this.word = new Word(noun);
         this.entity = null;
     }
@@ -150,6 +166,7 @@ public enum Element {
      * @param operator the operator associated with the element
      */
     Element(Operator operator) {
+    	Objects.requireNonNull(operator);
         this.word = new Word(operator);
         this.entity = null;
     }
@@ -160,6 +177,7 @@ public enum Element {
      * @param property the associated property
      */
     Element(Property property) {
+    	Objects.requireNonNull(property);
         this.word = new Word(property);
         this.entity = null;
     }
@@ -170,6 +188,7 @@ public enum Element {
      * @param entity the associated entity
      */
     Element(Entity entity) {
+    	Objects.requireNonNull(entity);
         this.word = null;
         this.entity = entity;
     }
@@ -200,31 +219,4 @@ public enum Element {
     public boolean isProperty() {
         return this.entity == null && this.word != null && this.word.getProperty() != null;
     }
-
-//    /**
-//     * Returns a string representation of the element.
-//     *
-//     * @return the string representation of the element
-//     */
-//    @Override
-//    public String toString() {
-//        if (word != null) {
-//            return word.toString().substring(0, 1).toLowerCase();
-//        }
-//        switch (this) {
-//            case ENTITY_BABA: return "B";
-//            case ENTITY_FLAG: return "F";
-//            case ENTITY_WALL: return "W";
-//            case ENTITY_WATER: return "A";
-//            case ENTITY_SKULL: return "S";
-//            case ENTITY_LAVA: return "L";
-//            case ENTITY_ROCK: return "R";
-//            case EMPTY: return "-";
-//            case ENTITY_FLOWER: return "o";
-//            case ENTITY_GRASS: return "g";
-//            case ENTITY_TILE: return "J";
-//            default: return "?";
-//        }
-//    }
-
 }

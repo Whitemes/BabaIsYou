@@ -39,6 +39,8 @@ public class ImageLoader {
             mapCharToElement.put(Element.FLOWER, getImage("flowerWord.gif"));
             mapCharToElement.put(Element.ENTITY_GRASS, getImage("grassEntity.gif"));
             mapCharToElement.put(Element.GRASS, getImage("grassWord.gif"));
+            mapCharToElement.put(Element.ENTITY_SMILEY, getImage("smileyEntity.gif"));
+            mapCharToElement.put(Element.GRASS, getImage("grassWord.gif"));
             mapCharToElement.put(Element.HOT, getImage("hotWord.gif"));
             mapCharToElement.put(Element.IS, getImage("isWord.gif"));
             mapCharToElement.put(Element.ENTITY_LAVA, getImage("lavaEntity.gif"));
@@ -51,6 +53,7 @@ public class ImageLoader {
             mapCharToElement.put(Element.ENTITY_SKULL, getImage("skullEntity.gif"));
             mapCharToElement.put(Element.SKULL, getImage("skullWord.gif"));
             mapCharToElement.put(Element.STOP, getImage("stopWord.gif"));
+            mapCharToElement.put(Element.JUMP, getImage("jumpWord.gif"));
             mapCharToElement.put(Element.ENTITY_TILE, getImage("tileEntity.gif"));
             mapCharToElement.put(Element.TILE, getImage("tileWord.gif"));
             mapCharToElement.put(Element.ENTITY_WALL, getImage("wallEntity.gif"));

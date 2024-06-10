@@ -85,8 +85,8 @@ public class Transmutation {
      */
     public void applyTransformation(Noun source, Noun dest) {
         var grid = level.getGrid();
-        var sourceElement = Rules.getEntityByNoun(source);
-        var destElement = Rules.getEntityByNoun(dest);
+        var sourceElement = Rules.getEntityByNoun(Objects.requireNonNull(source));
+        var destElement = Rules.getEntityByNoun(Objects.requireNonNull(dest));
 
         for (var row : grid) {
             for (var cell : row) {
