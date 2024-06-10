@@ -1,8 +1,9 @@
 package baba.is.you.model;
 
 /**
- * The Element enum represents various elements in the game.
- * Each element can be associated with a Word or an Entity.
+ * The Element enum represents various elements in the game "BABA IS YOU".
+ * Each element can be either a game entity, a rule word (noun, operator, or property), or a combination thereof.
+ * This classification enables the elements to interact differently within the game's logic and rules.
  */
 public enum Element {
     /**
@@ -133,9 +134,9 @@ public enum Element {
     private final Entity entity;
 
     /**
-     * Constructor for elements associated with a noun.
+     * Constructor for elements defined by an operator.
      *
-     * @param noun the noun associated with the element
+     * @param operator the associated operator
      */
     Element(Noun noun) {
     	
@@ -154,9 +155,9 @@ public enum Element {
     }
 
     /**
-     * Constructor for elements associated with a property.
+     * Constructor for elements defined by a property.
      *
-     * @param property the property associated with the element
+     * @param property the associated property
      */
     Element(Property property) {
         this.word = new Word(property);
@@ -164,9 +165,9 @@ public enum Element {
     }
 
     /**
-     * Constructor for elements associated with an entity.
+     * Constructor for elements defined by an entity.
      *
-     * @param entity the entity associated with the element
+     * @param entity the associated entity
      */
     Element(Entity entity) {
         this.word = null;
@@ -174,27 +175,27 @@ public enum Element {
     }
 
     /**
-     * Gets the word associated with the element.
+     * Retrieves the word associated with the element, if applicable.
      *
-     * @return the associated word, or null if none
+     * @return the word associated with this element, or null if the element is defined by an entity alone
      */
     public Word getWord() {
         return word;
     }
 
     /**
-     * Gets the entity associated with the element.
+     * Retrieves the entity associated with the element, if applicable.
      *
-     * @return the associated entity, or null if none
+     * @return the entity associated with this element, or null if the element is defined by a word alone
      */
     public Entity getEntity() {
         return entity;
     }
 
     /**
-     * Checks if the element is a property.
+     * Determines whether the element is defined as a property.
      *
-     * @return true if the element is a property, false otherwise
+     * @return true if this element represents a property, false otherwise
      */
     public boolean isProperty() {
         return this.entity == null && this.word != null && this.word.getProperty() != null;

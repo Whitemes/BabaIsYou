@@ -1,8 +1,9 @@
 package baba.is.you.model;
 
 /**
- * The Property enum represents various properties that elements in the game can have.
- * These properties define the behaviors and interactions of the elements.
+ * The Property enum represents various properties that elements in the game "BABA IS YOU" can possess.
+ * These properties are crucial for defining the behaviors and interactions of the elements within the game environment,
+ * dictating everything from movement to game-ending conditions.
  */
 public enum Property {
     /**

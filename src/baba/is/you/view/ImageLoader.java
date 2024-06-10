@@ -9,16 +9,20 @@ import javax.swing.ImageIcon;
 import baba.is.you.model.Element;
 
 /**
- * The Images class is responsible for loading and managing images for the game elements.
- * It provides methods to initialize the mapping between game elements and their corresponding images.
+ * Manages the loading and storage of image icons for game elements in "BABA IS YOU".
+ * This class provides a central repository for image icons, allowing easy retrieval of visuals
+ * corresponding to various game elements.
  */
 public class ImageLoader {
 
-    /** A map that associates game elements with their corresponding image icons. */
+	/**
+	 *  A map that associates game elements with their corresponding image icons. 
+	 */
     private Map<Element, ImageIcon> mapCharToElement;
 
     /**
-     * Constructs an Images object and initializes the image mappings.
+     * Constructs an ImageLoader object and initializes the image mappings by loading the images
+     * from specified file paths.
      */
     public ImageLoader() {
         mapCharToElement = new HashMap<>();
@@ -61,11 +65,11 @@ public class ImageLoader {
     }
 
     /**
-     * Loads an image from the specified path.
+     * Loads an image from the specified path and returns it as an ImageIcon.
      *
-     * @param imagePath the path to the image file
-     * @return the loaded ImageIcon
-     * @throws IOException if an error occurs while reading the image file
+     * @param imagePath the path to the image file relative to the classpath
+     * @return the ImageIcon loaded from the specified file
+     * @throws IOException if there is an error loading the image from the specified path
      */
     private ImageIcon getImage(String imagePath) throws IOException {
         Objects.requireNonNull(imagePath, "imagePath must not be null");
@@ -77,10 +81,11 @@ public class ImageLoader {
     }
 
     /**
-     * Retrieves the image icon associated with the specified game element.
+     * Retrieves the ImageIcon associated with a given game element.
+     * This method allows for the visualization of game elements using the preloaded images.
      *
-     * @param element the game element whose image icon is to be retrieved
-     * @return the ImageIcon associated with the specified element, or null if no image is found
+     * @param element the game element whose associated ImageIcon is to be retrieved
+     * @return the ImageIcon associated with the specified game element, or null if there is no image associated with the element
      */
     public ImageIcon getImageIcon(Element element) {
         return mapCharToElement.get(element);

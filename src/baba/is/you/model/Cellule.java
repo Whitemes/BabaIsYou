@@ -22,7 +22,7 @@ public class Cellule {
     /**
      * Adds an element to the cell.
      * 
-     * @param element the element to be added to the cell
+     * @param element the element to be added to the cell; must not be null.
      */
     public void addElement(Element element) {
         elements.add(element);
@@ -31,7 +31,7 @@ public class Cellule {
     /**
      * Removes a specified element from the cell.
      * 
-     * @param element the element to be removed from the cell
+     * @param element the element to be removed from the cell; does nothing if element is not found.
      */
     public void removeElement(Element element) {
         elements.remove(element);
@@ -40,7 +40,7 @@ public class Cellule {
     /**
      * Returns a list of all elements currently in the cell.
      * 
-     * @return a list containing the elements in the cell
+     * @return a new list containing the elements in the cell, ensuring encapsulation.
      */
     public List<Element> getElements() {
         return elements;
@@ -157,9 +157,9 @@ public class Cellule {
     /**
      * Removes elements specified in a set from the cell and returns them in a new cell.
      *
-     * @param elementsToPop the set of elements to be removed
-     * @return a new cell containing the removed elements
-     * @throws NullPointerException if the elementsToPop is null
+     * @param elementsToPop the set of elements to be removed; must not be null.
+     * @return a new cell containing the removed elements; returns an empty cell if no elements match.
+     * @throws NullPointerException if the elementsToPop is null.
      */
     public Cellule popElements(Set<Element> elementsToPop) {
         Objects.requireNonNull(elementsToPop, "elementsToPop must not be null");
@@ -179,12 +179,17 @@ public class Cellule {
     /**
      * Determines whether the cell is empty.
      * 
-     * @return true if there are no elements in the cell, otherwise false
+     * @return true if there are no elements in the cell, otherwise false.
      */
     public boolean isEmpty() {
         return elements.isEmpty();
     }
 
+    /**
+     * Provides a string representation of the cell.
+     * 
+     * @return a string representation of the last element in the cell, or an empty string if the cell is empty.
+     */
     @Override
     public String toString() {
         if (elements.isEmpty()) {

@@ -1,7 +1,9 @@
 package baba.is.you.model;
 
 /**
- * The Word class represents a word in the game, which can be a noun, an operator, or a property.
+ * The Word class encapsulates the concept of words used in the game "BABA IS YOU",
+ * which can be either a noun, an operator, or a property. Each word has the potential
+ * to affect gameplay by forming rules that define the behaviors and interactions of game elements.
  */
 public class Word {
 	

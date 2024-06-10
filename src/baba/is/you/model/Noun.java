@@ -1,8 +1,9 @@
 package baba.is.you.model;
 
 /**
- * The Noun enum represents various noun elements in the game.
- * These elements can form part of the game's rules.
+ * The Noun enum represents various noun elements in the game "BABA IS YOU".
+ * These nouns are integral to forming rules that dictate gameplay mechanics,
+ * such as defining what the player can control or what constitutes a winning condition.
  */
 public enum Noun {
     /**

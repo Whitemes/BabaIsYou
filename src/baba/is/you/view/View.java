@@ -12,7 +12,8 @@ import com.github.forax.zen.ApplicationContext;
 import baba.is.you.model.Cellule;
 
 /**
- * The View class handles the graphical representation of the game board.
+ * Manages the graphical display of the game board in "BABA IS YOU".
+ * This class handles drawing game elements and the board itself on the screen.
  */
 public class View {
     private int xOrigin;
@@ -24,14 +25,14 @@ public class View {
     private ImageLoader imageLoader;
 
     /**
-     * Constructor for View class.
+     * Creates a View instance to manage how the game's grid is displayed on the screen.
      *
-     * @param xOrigin  the x-coordinate of the origin of the board
-     * @param yOrigin  the y-coordinate of the origin of the board
-     * @param height   the height of the screen
-     * @param width    the width of the screen
-     * @param blockSize the size of each block on the board
-     * @param grid     the grid representing the game board
+     * @param xOrigin  the x-coordinate of the origin of the game board on the screen
+     * @param yOrigin  the y-coordinate of the origin of the game board on the screen
+     * @param height   the total height of the display area for the game
+     * @param width    the total width of the display area for the game
+     * @param blockSize the size of each block representing a single cell on the game board
+     * @param grid     the grid containing all the cell elements to be displayed
      */
     public View(int xOrigin, int yOrigin, int height, int width, int blockSize, List<List<Cellule>> grid) {
         this.xOrigin = xOrigin;
@@ -44,13 +45,12 @@ public class View {
     }
 
     /**
-     * Initializes the graphics for the game.
+     * Initializes the View instance with calculated dimensions based on the grid size and screen dimensions.
      *
-     * @param grid   the grid representing the game board
-     * @param height the height of the screen
-     * @param width  the width of the screen
-     * @return the initialized View instance
-     * @throws NullPointerException if the grid is null
+     * @param grid   the game grid to be displayed
+     * @param height the total height of the screen
+     * @param width  the total width of the screen
+     * @return the initialized View object configured for displaying the game
      */
     public static View initGameGraphics(List<List<Cellule>> grid, int height, int width) {
         Objects.requireNonNull(grid, "Grid must not be null");
@@ -69,35 +69,35 @@ public class View {
     }
 
     /**
-     * Calculates the y-coordinate from the row index.
+     * Converts the row index into a y-coordinate on the screen based on the block size.
      *
      * @param j the row index
-     * @return the y-coordinate
+     * @return the y-coordinate for the row
      */
     private float yFromJ(int j) {
         return yOrigin + j * blockSize;
     }
 
+
     /**
-     * Calculates the x-coordinate from the column index.
+     * Converts the column index into an x-coordinate on the screen based on the block size.
      *
      * @param i the column index
-     * @return the x-coordinate
+     * @return the x-coordinate for the column
      */
     private float xFromI(int i) {
         return xOrigin + i * blockSize;
     }
 
     /**
-     * Draws an image on the board.
+     * Draws an image within a specified rectangle on the graphics context provided.
      *
-     * @param graphics the graphics context
-     * @param imageIcon the image icon to be drawn
-     * @param x the x-coordinate
-     * @param y the y-coordinate
-     * @param dimX the width dimension
-     * @param dimY the height dimension
-     * @throws NullPointerException if graphics or imageIcon is null
+     * @param graphics the Graphics2D context on which the image is to be drawn
+     * @param imageIcon the image icon to draw
+     * @param x the x-coordinate where the image should be drawn
+     * @param y the y-coordinate where the image should be drawn
+     * @param dimX the width of the image
+     * @param dimY the height of the image
      */
     private void drawImage(Graphics2D graphics, ImageIcon imageIcon, float x, float y, float dimX, float dimY) {
         Objects.requireNonNull(graphics, "Graphics context must not be null");
@@ -113,12 +113,11 @@ public class View {
     }
 
     /**
-     * Draws a single cell on the board.
+     * Draws the graphical representation of a single cell located at specified row and column indices.
      *
      * @param graphics the graphics context
-     * @param i the row index
-     * @param j the column index
-     * @throws NullPointerException if graphics is null
+     * @param i the row index of the cell
+     * @param j the column index of the cell
      */
     private void drawCell(Graphics2D graphics, int i, int j) {
         Objects.requireNonNull(graphics, "Graphics context must not be null");
@@ -133,10 +132,11 @@ public class View {
     }
 
     /**
-     * Draws the entire game board.
+     * Draws the entire game board on the provided graphics context.
+     * This method iterates over the entire grid, drawing each cell.
      *
      * @param graphics the graphics context
-     * @param grid the grid representing the game board
+     * @param grid the grid of cells representing the game board
      * @throws NullPointerException if graphics or grid is null
      */
     private void draw(Graphics2D graphics, List<List<Cellule>> grid) {
@@ -155,12 +155,13 @@ public class View {
     }
 
     /**
-     * Renders the game board.
+     * Renders the game board on the application's display area.
+     * This is the main method used to update the graphical display of the game.
      *
-     * @param context the application context
-     * @param grid the grid representing the game board
-     * @param view the View instance
-     * @throws NullPointerException if context, grid, or view is null
+     * @param context the application context used for handling the rendering
+     * @param grid the grid to be displayed
+     * @param view the View object managing the drawing parameters and operations
+     * @throws NullPointerException if any of the parameters are null
      */
     public static void draw(ApplicationContext context, List<List<Cellule>> grid, View view) {
         Objects.requireNonNull(context, "Application context must not be null");
