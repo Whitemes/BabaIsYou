@@ -264,7 +264,7 @@ public class Game {
      */
     public static void main(String[] args) {
         Application.run(Color.BLACK, t -> {
-            var game = new Game("assets/text/levels");
+            var game = new Game("resources/text/levels");
             game.start(t);
         });
     }

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="BabaIsYou" basedir="." default="all">
+
+    <!-- Define the directory paths -->
+    <property name="app.name"	value="baba"/>
+	<property name="java.compile.version" value="21"/>
+    <property name="src.dir"     value="src"/>
+    <property name="classes.dir" value="classes"/>
+	<property name="lib.dir" location="lib"/>
+	<property name="build.dir"     value="build"/>
+    <property name="docs.dir"    value="docs/doc"/>
+    <property name="bin.dir"    value="bin"/>
+
+    <!-- Define the classpath -->
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="*.jar"/>
+    </path>
+
+    <!-- Initialize directory structure -->
+    <target name="init">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.dir}/${classes.dir}"/>
+        <mkdir dir="${docs.dir}"/>
+    </target>
+
+    <!-- Compile the source code -->
+    <target name="compile" depends="init">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}/${classes.dir}" includeantruntime="false">
+            <classpath refid="classpath"/>
+        </javac>
+    </target>
+
+    <!-- Create the executable JAR -->
+    <target name="jar" depends="compile">
+        <jar destfile="${build.dir}/baba.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="baba.is.you.controller.Game"/>
+                <attribute name="Class-Path" value="lib/zen-6.0.jar"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <!-- Generate Javadoc -->
+    <target name="javadoc" depends="init">
+        <javadoc sourcepath="${src.dir}" destdir="${docs.dir}" failonerror="false">
+            <classpath refid="classpath"/>
+            <arg value="-quiet"/>
+        </javadoc>
+    </target>
+
+    <!-- Clean up build artifacts -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${docs.dir}"/>
+    	<delete dir="${classes.dir}"/>
+    	<delete dir="${bin.dir}"/>
+    </target>
+
+    <!-- Default target to do everything -->
+    <target name="all" depends="compile, jar, javadoc">
+    </target>
+
+</project>
