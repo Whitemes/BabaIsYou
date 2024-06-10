@@ -8,6 +8,14 @@ import java.util.*;
  * and organize them into a structured format that maps options to their respective arguments.
  */
 public class CommandLineParser {
+	
+	/**
+	 * Default Constructor
+	 */
+	public CommandLineParser() {
+		
+	}
+	
     /**
      * Parses the command-line arguments into a map where each option (a string starting with "--") 
      * is associated with a list of argument lists. This method groups arguments following an option 

@@ -62,6 +62,8 @@ public class ImageLoader {
             mapCharToElement.put(Element.WATER, getImage("waterWord.gif"));
             mapCharToElement.put(Element.WIN, getImage("winWord.gif"));
             mapCharToElement.put(Element.YOU, getImage("youWord.gif"));
+            mapCharToElement.put(Element.SMILEY, getImage("smileyWord.gif"));
+            
         } catch (IOException e) {
             e.printStackTrace();
         }

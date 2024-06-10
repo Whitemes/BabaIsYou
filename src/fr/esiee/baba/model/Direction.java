@@ -54,11 +54,21 @@ public enum Direction {
         return dy;
     }
     
-    public int getJumpDx() { // Add this method
+    /**
+     * Gets the change in the x-coordinate x2 for the direction.
+     *
+     * @return the change in the x-coordinate
+     */
+    public int getJumpDx() {
         return 2 * dx;
     }
 
-    public int getJumpDy() { // Add this method
+    /**
+     * Gets the change in the y-coordinate x2 for the direction.
+     *
+     * @return the change in the y-coordinate
+     */
+    public int getJumpDy() {
         return 2 * dy;
     }
 

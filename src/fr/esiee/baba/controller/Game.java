@@ -39,6 +39,7 @@ public class Game {
 	 * Constructs a Game instance by loading a single level.
 	 *
 	 * @param levelFilePath the path to the level file.
+	 * @param isSingleLevel to determine if it is a single Level or not.
 	 */
 	public Game(String levelFilePath, boolean isSingleLevel) {
 		this.elementMap = createElementMap();
@@ -253,11 +254,11 @@ public class Game {
 		map.put("L", Element.ENTITY_LAVA);
 		map.put("R", Element.ENTITY_ROCK);
 		map.put("G", Element.ENTITY_GRASS);
-		map.put("x", Element.ENTITY_SMILEY);
+		map.put("X", Element.ENTITY_SMILEY);
 		map.put("-", Element.EMPTY);
 		map.put("o", Element.FLOWER);
 		map.put("g", Element.GRASS);
-		map.put("J", Element.ENTITY_TILE);
+		map.put("T", Element.ENTITY_TILE);
 		map.put("j", Element.TILE);
 		return map;
 	}
