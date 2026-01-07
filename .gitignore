@@ -1,2 +1,20 @@
+# Compiled class files
 /bin/
 /classes/
+/build/
+
+# Gradle
+.gradle/
+gradle-wrapper.jar
+.gradle-wrapper.properties
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
