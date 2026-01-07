@@ -25,15 +25,15 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<String, GameSession> sessions = new ConcurrentHashMap<>();
 
+    @Autowired
+    private ResourcePatternResolver resourceResolver;
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         // Create a Renderer specific to this session
         Renderer sessionRenderer = level -> {
             try {
                 if (session.isOpen()) {
-                    // Serialize simplified grid state
-                    // We might want a DTO instead of full circular object graph if any
-                    // But Cellule -> Element is a tree, usually fine unless Element has back-ref
                     String json = objectMapper.writeValueAsString(level.getGrid());
                     session.sendMessage(new TextMessage(json));
                 }
@@ -42,18 +42,39 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
             }
         };
 
-        String levelPath = "src/main/resources/text"; // Default path
-        Game game = new Game(levelPath, sessionRenderer);
+        // Load levels from classpath
+        List<Level> levels = new ArrayList<>();
+        try {
+            Resource[] resources = resourceResolver.getResources("classpath:static/text/*.txt");
+            // Check both standard text/ and static/text/ just in case
+            if (resources == null || resources.length == 0) {
+                resources = resourceResolver.getResources("classpath:text/*.txt");
+            }
+
+            // Sort resources to ensure level order
+            Arrays.sort(resources, Comparator.comparing(Resource::getFilename));
+
+            for (Resource res : resources) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(res.getInputStream()))) {
+                    List<String> lines = reader.lines().toList();
+                    levels.add(Game.parseLevel(lines, res.getFilename()));
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error loading levels: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        if (levels.isEmpty()) {
+            System.err.println("WARNING: No levels loaded!");
+        }
+
+        Game game = new Game(levels, sessionRenderer);
 
         GameSession gameSession = new GameSession(game, session);
         sessions.put(session.getId(), gameSession);
 
         System.out.println("New session connected: " + session.getId());
-
-        // Start game in a separate thread to not block WS handler?
-        // Game.start() is a loop (if not Event Driven).
-        // We refactored Game to be Event Driven (handleAction), but start() calls
-        // loadNextLevel which calls render().
         game.start();
     }
 
