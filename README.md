@@ -1,152 +1,78 @@
-# BABA IS YOU
+# Baba Is You - Engineering Edition
 
-Implémentation Java du jeu de puzzle **BABA IS YOU**, développée dans le cadre d'un projet académique à l'ESIEE.
+A professional reimplementation of the "Baba Is You" puzzle game engine, focusing on **Software Architecture**, **Clean Code**, and **Cloud Deployment**.
 
-## Description
+![Status](https://img.shields.io/badge/Status-Complete-success)
+![Stack](https://img.shields.io/badge/Tech-Java%2021%20%7C%20Spring%20Boot%20%7C%20WebSockets%20%7C%20Docker-blue)
 
-**BABA IS YOU** est un jeu de puzzle innovant où les règles du jeu font partie du niveau lui-même. Les joueurs manipulent des mots pour créer et modifier les règles, transformant ainsi la façon dont les éléments du jeu interagissent.
+## 🚀 Project Overview
 
-### Fonctionnalités principales
+This project transforms a legacy academic codebase into a robust, deployable web application.
+It demonstrates **logic/view separation**, **event-driven design**, and **containerization**.
 
-- **Système de règles dynamiques** : Les règles sont formées par des mots disposés dans le niveau (ex: "BABA IS YOU", "WALL IS STOP")
-- **Transformations d'éléments** : Possibilité de transformer des objets en d'autres (ex: "ROCK IS WALL")
-- **Propriétés multiples** : PUSH, STOP, WIN, DEFEAT, MELT, HOT, SINK, JUMP
-- **Interface graphique** : Affichage avec images et animations
-- **Multiples niveaux** : Support de niveaux personnalisés
+### Key Engineering Features
+- **Hexagonal-like Architecture**: Core game logic (`model`) is completely decoupled from the rendering layer (`web`).
+- **Event-Driven Game Loop**: The game state evolves based on `GameAction` events processed via WebSockets.
+- **headless-ready**: The core engine runs without any graphical dependencies (AWT/Swing removed), making it perfect for cloud servers.
+- **Tests**: Comprehensive JUnit 5 tests validation of rule parsing and movement logic.
 
-## Prérequis
+## 🛠️ Architecture
 
-- **Java 21** ou supérieur
-- **Apache Ant** (pour la compilation)
-- Bibliothèque **ZEN 6.0** (incluse dans `lib/`)
-
-## Structure du projet
-
-```
-RAMANANJATOVO_BabaIsYou/
-├── src/                          # Code source Java
-│   └── fr/esiee/baba/
-│       ├── controller/           # Contrôleurs (Game, CommandLineParser)
-│       ├── model/               # Modèle du jeu (Level, Rules, Elements...)
-│       └── view/                # Interface graphique
-├── resources/                   # Ressources du jeu
-│   ├── images/                  # Images des éléments
-│   └── text/                    # Fichiers de niveaux
-├── lib/                         # Bibliothèques externes
-├── docs/                        # Documentation
-└── build.xml                    # Script de build Ant
+```mermaid
+graph TD
+    Client[Web Client (HTML5/Canvas)] <-->|WebSocket/JSON| Handler[GameWebSocketHandler]
+    Handler --> Controller[Game Controller]
+    Controller --> Logic[Core Logic (Rules/Level)]
+    Logic --> Model[Data Model (Cellule/Element)]
 ```
 
-## Installation et compilation
+### Modules
+- **`fr.esiee.baba.core`**: Abstractions for Input and Rendering.
+- **`fr.esiee.baba.model`**: Pure domain logic (Rules, Transmutation, Grid).
+- **`fr.esiee.baba.controller`**: Manages the game flow.
+- **`fr.esiee.baba.web`**: WebSocket adapter for the browser frontend.
 
-### Compilation avec Ant
+## 📦 Deployment
+
+The project is containerized using Docker and built with Gradle.
+
+### Running with Docker (Recommended)
+No local Java/Gradle required.
 
 ```bash
-# Compilation complète (nettoyage, compilation, JAR, documentation)
-ant all
-
-# Compilation seule
-ant compile
-
-# Création du JAR
-ant jar
-
-# Génération de la documentation
-ant javadoc
-
-# Nettoyage
-ant clean
+# Build and Run
+docker build -t baba-is-you .
+docker run -p 8080:8080 baba-is-you
 ```
 
-## Utilisation
+Access the game at: `http://localhost:8080`
 
-### Lancement du jeu
+### Local Development
+Prerequisites: Java 21.
 
 ```bash
-# Niveau par défaut
-java -jar dist/baba.jar
+# MacOS/Linux
+./gradlew bootRun
 
-# Niveau spécifique
-java -jar dist/baba.jar --level "path/to/level.txt"
-
-# Tous les niveaux d'un dossier
-java -jar dist/baba.jar --levels "path/to/levels/"
-
-# Exécution de règles personnalisées
-java -jar dist/baba.jar --execute "ROCK IS WIN"
+# Windows
+gradle bootRun
 ```
 
-### Contrôles
+## 🧪 Testing
 
-- **Flèches directionnelles** : Déplacement
-- **Échap** : Quitter le jeu
+The logic is verified using JUnit 5.
 
-### Format des niveaux
-
-Les niveaux sont définis dans des fichiers texte avec des caractères spécifiques :
-
-#### Entités
-- `B` : Baba (entité)
-- `F` : Drapeau (entité)
-- `W` : Mur (entité)
-- `R` : Rocher (entité)
-- `A` : Eau (entité)
-- `S` : Crâne (entité)
-- `L` : Lave (entité)
-
-#### Mots (règles)
-- `b` : BABA (mot)
-- `f` : FLAG (mot)
-- `w` : WALL (mot)
-- `r` : ROCK (mot)
-- `i` : IS (opérateur)
-- `y` : YOU (propriété)
-- `v` : WIN (propriété)
-- `t` : STOP (propriété)
-- `p` : PUSH (propriété)
-
-## Architecture
-
-### Modèle MVC
-
-Le projet suit le pattern **Modèle-Vue-Contrôleur** :
-
-- **Modèle** : Gestion de l'état du jeu, règles, éléments
-- **Vue** : Affichage graphique du jeu
-- **Contrôleur** : Gestion des interactions utilisateur
-
-### Classes principales
-
-- `Game` : Contrôleur principal du jeu
-- `Level` : Représentation d'un niveau
-- `Rules` : Gestion des règles dynamiques
-- `Transmutation` : Application des transformations
-- `Element` : Énumération des éléments du jeu
-- `View` : Interface graphique
-
-## Exemples de règles
-
-```
-BABA IS YOU    # Baba est contrôlé par le joueur
-WALL IS STOP   # Les murs bloquent le mouvement
-FLAG IS WIN    # Toucher le drapeau fait gagner
-ROCK IS PUSH   # Les rochers peuvent être poussés
-LAVA IS HOT    # La lave est chaude
-ICE IS MELT    # La glace peut fondre
+```bash
+gradle test
 ```
 
-## Tests
+## 📝 Rules Implemented
+- **Movement**: `YOU` objects move on user input.
+- **Push**: `PUSH` objects move if pushed by `YOU`.
+- **Win**: `YOU` on `WIN` triggers victory.
+- **Defeat**: `YOU` on `DEFEAT` triggers removal.
+- **Transform**: `NOUN IS NOUN` transforms entities (e.g., `ROCK IS WALL`).
 
-Des niveaux de test sont disponibles dans `resources/text/test/`.
-
-## Documentation
-
-La documentation Javadoc est générée dans `docs/doc/` avec la commande `ant javadoc`.
-
-## Auteur
-
-**RAMANANJATOVO** - Projet ESIEE Paris
-
-## Licence
-
-Projet académique - ESIEE Paris
+## 👤 Author
+**RAMANANJATOVO** - ESIEE Paris
+refactored by **Antigravity Agent**
