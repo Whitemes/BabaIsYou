@@ -228,11 +228,42 @@ public class Level {
 
     /**
      * Checks if the level has been completed, i.e., if the win condition has been met.
-     * 
+     *
      * @return true if the level is completed, false otherwise.
      */
     public boolean isCompleted() {
         return completed;
+    }
+
+    /**
+     * Creates a deep copy of the current grid state.
+     * Used for UNDO functionality to save level snapshots.
+     *
+     * @return a deep copy of the grid
+     */
+    public List<List<Cellule>> copyGrid() {
+        List<List<Cellule>> gridCopy = new ArrayList<>();
+        for (List<Cellule> row : grid) {
+            List<Cellule> rowCopy = new ArrayList<>();
+            for (Cellule cell : row) {
+                rowCopy.add(cell.copy());
+            }
+            gridCopy.add(rowCopy);
+        }
+        return gridCopy;
+    }
+
+    /**
+     * Restores the grid from a saved state.
+     * Used for UNDO functionality.
+     *
+     * @param savedGrid the grid state to restore
+     */
+    public void restoreGrid(List<List<Cellule>> savedGrid) {
+        this.grid = savedGrid;
+        // Reinitialize rules after restoring grid
+        this.rules = new Rules(this);
+        this.rules.initRules(this);
     }
 
     /**

@@ -4,6 +4,7 @@ import fr.esiee.baba.controller.Game;
 import fr.esiee.baba.controller.Game.GameAction;
 import fr.esiee.baba.core.Renderer;
 import fr.esiee.baba.model.Level;
+import fr.esiee.baba.model.Cellule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,16 +130,89 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
             return;
         }
 
+        // Handle UNDO specially - restore previous state
+        if ("UNDO".equalsIgnoreCase(payload)) {
+            handleUndo(gameSession, session);
+            return;
+        }
+
+        // For movement commands, save state before executing
+        boolean isMovement = false;
         try {
             GameAction action = GameAction.valueOf("MOVE_" + payload.toUpperCase());
+            isMovement = true;
+            // Save current state before movement
+            saveStateForUndo(gameSession);
             gameSession.game.handleAction(action);
         } catch (IllegalArgumentException e) {
             try {
                 GameAction action = GameAction.valueOf(payload.toUpperCase());
+                // RESTART and UNDO are already handled above, no need to save state
                 gameSession.game.handleAction(action);
             } catch (IllegalArgumentException ex) {
                 logger.warn("Unknown command received: {} from session: {}", payload, session.getId());
             }
+        }
+    }
+
+    private void saveStateForUndo(GameSession gameSession) {
+        try {
+            // Get current level from game
+            Level currentLevel = gameSession.game.getCurrentLevel();
+            if (currentLevel != null) {
+                // Save grid state
+                List<List<Cellule>> gridSnapshot = currentLevel.copyGrid();
+                gameSession.undoHistory.addLast(gridSnapshot);
+
+                // Limit history size
+                if (gameSession.undoHistory.size() > GameSession.MAX_UNDO_HISTORY) {
+                    gameSession.undoHistory.removeFirst();
+                }
+
+                logger.debug("Saved state for UNDO (history size: {})", gameSession.undoHistory.size());
+            }
+        } catch (Exception e) {
+            logger.error("Failed to save state for UNDO", e);
+        }
+    }
+
+    private void handleUndo(GameSession gameSession, WebSocketSession session) {
+        logger.info("Handling UNDO request for session: {}", session.getId());
+
+        try {
+            if (gameSession.undoHistory.isEmpty()) {
+                logger.debug("No UNDO history available for session: {}", session.getId());
+                return;
+            }
+
+            // Get the last saved state
+            List<List<Cellule>> previousState = gameSession.undoHistory.removeLast();
+
+            // Restore the state to current level
+            Level currentLevel = gameSession.game.getCurrentLevel();
+            if (currentLevel != null) {
+                currentLevel.restoreGrid(previousState);
+
+                // Create renderer to send updated state to client
+                Renderer sessionRenderer = level -> {
+                    try {
+                        if (session.isOpen()) {
+                            String json = objectMapper.writeValueAsString(level.getGrid());
+                            session.sendMessage(new TextMessage(json));
+                            logger.debug("Sent game state after UNDO - Session: {}", session.getId());
+                        }
+                    } catch (IOException e) {
+                        logger.error("Failed to send game state after UNDO - Session: {}", session.getId(), e);
+                    }
+                };
+
+                // Render the restored state
+                sessionRenderer.render(currentLevel);
+
+                logger.info("UNDO completed (history size: {})", gameSession.undoHistory.size());
+            }
+        } catch (Exception e) {
+            logger.error("Failed to undo action for session: {}", session.getId(), e);
         }
     }
 
@@ -174,10 +248,13 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
             Game newGame = new Game(freshLevels, sessionRenderer);
             gameSession.game = newGame;
 
+            // Clear UNDO history on restart
+            gameSession.undoHistory.clear();
+
             // Start the game (which renders the initial level)
             newGame.start();
 
-            logger.info("Game restarted successfully for session: {}", session.getId());
+            logger.info("Game restarted successfully for session: {} (UNDO history cleared)", session.getId());
 
         } catch (Exception e) {
             logger.error("Failed to restart game for session: {}", session.getId(), e);
@@ -194,11 +271,14 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
         Game game;
         WebSocketSession session;
         List<LevelResource> levelResources; // Store original level data for restart
+        Deque<List<List<Cellule>>> undoHistory; // UNDO history (max 50 states)
+        static final int MAX_UNDO_HISTORY = 50;
 
         public GameSession(Game game, WebSocketSession session, List<LevelResource> levelResources) {
             this.game = game;
             this.session = session;
             this.levelResources = levelResources;
+            this.undoHistory = new ArrayDeque<>();
         }
     }
 

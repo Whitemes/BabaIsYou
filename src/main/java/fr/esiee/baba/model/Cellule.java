@@ -177,11 +177,24 @@ public class Cellule {
 
     /**
      * Determines whether the cell is empty.
-     * 
+     *
      * @return true if there are no elements in the cell, otherwise false.
      */
     public boolean isEmpty() {
         return elements.isEmpty();
+    }
+
+    /**
+     * Creates a deep copy of this cell.
+     *
+     * @return a new Cellule with the same elements
+     */
+    public Cellule copy() {
+        Cellule copied = new Cellule();
+        for (Element element : this.elements) {
+            copied.addElement(element);
+        }
+        return copied;
     }
 
     /**

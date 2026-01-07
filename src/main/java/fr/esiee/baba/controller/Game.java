@@ -175,8 +175,8 @@ public class Game {
                 return;
             }
             case UNDO -> {
-                // UNDO not implemented yet - would need state history
-                logger.debug("UNDO requested but not implemented");
+                // UNDO is now handled in GameWebSocketHandler (state history system)
+                logger.debug("UNDO action received (handled by WebSocketHandler)");
                 return;
             }
             case MOVE_LEFT -> direction = Direction.LEFT;
@@ -209,5 +209,18 @@ public class Game {
 
     public boolean isFinished() {
         return isFinished;
+    }
+
+    /**
+     * Gets the current level being played.
+     * Used by WebSocketHandler for UNDO functionality.
+     *
+     * @return the current Level, or null if no level is active
+     */
+    public Level getCurrentLevel() {
+        if (currentLevelIndex >= 0 && currentLevelIndex < levels.size()) {
+            return levels.get(currentLevelIndex);
+        }
+        return null;
     }
 }
