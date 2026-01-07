@@ -16,39 +16,103 @@ const IMAGE_NAMES = [
 
 // Load Images
 let imagesLoaded = 0;
+let imageErrors = 0;
+
+console.log('Loading', IMAGE_NAMES.length, 'images...');
+statusDiv.innerText = `Loading assets... (0/${IMAGE_NAMES.length})`;
+
 IMAGE_NAMES.forEach(name => {
     const img = new Image();
     img.src = `images/${name}.gif`;
+
     img.onload = () => {
         imagesLoaded++;
-        if (imagesLoaded === IMAGE_NAMES.length) {
+        statusDiv.innerText = `Loading assets... (${imagesLoaded}/${IMAGE_NAMES.length})`;
+
+        if (imagesLoaded + imageErrors === IMAGE_NAMES.length) {
+            if (imageErrors > 0) {
+                console.warn(`Loaded ${imagesLoaded} images with ${imageErrors} errors`);
+            } else {
+                console.log('All images loaded successfully');
+            }
             connect();
         }
     };
+
+    img.onerror = () => {
+        imageErrors++;
+        console.error('Failed to load image:', name);
+        statusDiv.innerText = `Loading assets... (${imagesLoaded}/${IMAGE_NAMES.length}, ${imageErrors} errors)`;
+
+        if (imagesLoaded + imageErrors === IMAGE_NAMES.length) {
+            console.warn(`Loaded ${imagesLoaded} images with ${imageErrors} errors`);
+            connect();
+        }
+    };
+
     images[name] = img;
 });
 
 function connect() {
     // Dynamically choose WS or WSS based on current page protocol
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    socket = new WebSocket(`${protocol}//${window.location.host}/game-ws`);
+    const wsUrl = `${protocol}//${window.location.host}/game-ws`;
+
+    console.log('Connecting to WebSocket:', wsUrl);
+    statusDiv.innerText = 'Connecting to server...';
+
+    socket = new WebSocket(wsUrl);
 
     socket.onopen = () => {
-        statusDiv.innerText = 'Connected. Use Arrow Keys to Move. R to Restart.';
+        console.log('WebSocket connection established');
+        statusDiv.innerText = 'Connected. Use Arrow Keys to Move. R to Restart. Z to Undo.';
+        statusDiv.style.color = '#4ade80'; // Green
     };
 
     socket.onmessage = (event) => {
-        const grid = JSON.parse(event.data);
-        render(grid);
+        console.log('Received message from server');
+        try {
+            const data = JSON.parse(event.data);
+
+            // Check if this is an error message
+            if (data.error) {
+                statusDiv.innerText = `Server Error: ${data.error}`;
+                statusDiv.style.color = '#ef4444'; // Red
+                console.error('Server error:', data.error);
+                return;
+            }
+
+            // Normal grid data
+            render(data);
+        } catch (e) {
+            console.error('Failed to parse server message:', e);
+            statusDiv.innerText = 'Error: Invalid data received from server';
+            statusDiv.style.color = '#ef4444'; // Red
+        }
     };
 
-    socket.onclose = () => {
-        statusDiv.innerText = 'Disconnected.';
+    socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        statusDiv.innerText = 'Connection error. Check console for details.';
+        statusDiv.style.color = '#ef4444'; // Red
+    };
+
+    socket.onclose = (event) => {
+        console.log('WebSocket connection closed:', event.code, event.reason);
+        statusDiv.innerText = `Disconnected (Code: ${event.code}). Refresh to reconnect.`;
+        statusDiv.style.color = '#f59e0b'; // Orange
     };
 }
 
 function render(grid) {
-    if (!grid || grid.length === 0) return;
+    if (!grid || grid.length === 0) {
+        console.warn('Cannot render: Grid is empty or undefined');
+        statusDiv.innerText = 'Error: No game data received';
+        statusDiv.style.color = '#ef4444'; // Red
+        return;
+    }
+
+    console.log('Rendering grid:', grid.length, 'x', grid[0].length);
 
     const rows = grid.length;
     const cols = grid[0].length;
@@ -57,6 +121,8 @@ function render(grid) {
     canvas.height = rows * BLOCK_SIZE;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let renderedElements = 0;
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -70,15 +136,22 @@ function render(grid) {
                     const imgName = getElementName(el);
                     if (images[imgName]) {
                         ctx.drawImage(images[imgName], c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-                    } else {
-                        // Fallback text
-                        // ctx.fillStyle = 'white';
-                        // ctx.fillText(el, c * BLOCK_SIZE, r * BLOCK_SIZE + 12);
+                        renderedElements++;
+                    } else if (el !== 'EMPTY') {
+                        console.warn('Missing image for element:', el, '(expected:', imgName + ')');
+                        // Fallback: draw colored square
+                        ctx.fillStyle = '#ff00ff';
+                        ctx.fillRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                        ctx.fillStyle = 'white';
+                        ctx.font = '8px monospace';
+                        ctx.fillText(el.substring(0, 4), c * BLOCK_SIZE + 2, r * BLOCK_SIZE + 12);
                     }
                 });
             }
         }
     }
+
+    console.log('Rendered', renderedElements, 'elements');
 }
 
 function getElementName(enumStr) {

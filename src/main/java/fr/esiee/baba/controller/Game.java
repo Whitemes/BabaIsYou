@@ -2,6 +2,8 @@ package fr.esiee.baba.controller;
 
 import fr.esiee.baba.core.Renderer;
 import fr.esiee.baba.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -10,6 +12,8 @@ import java.util.*;
  * Refactored to be Event-Driven for WebSockets and Container-Ready.
  */
 public class Game {
+    private static final Logger logger = LoggerFactory.getLogger(Game.class);
+
     private final List<Level> levels;
     private int currentLevelIndex;
     private final Map<String, Element> elementMap;
@@ -124,8 +128,9 @@ public class Game {
     }
 
     public void start() {
+        logger.info("Game starting with {} levels", levels.size());
         if (levels.isEmpty()) {
-            System.out.println("No levels found.");
+            logger.error("Cannot start game: No levels found!");
             return;
         }
         loadCurrentLevel();
@@ -134,13 +139,19 @@ public class Game {
     private void loadCurrentLevel() {
         if (currentLevelIndex < levels.size()) {
             Level level = levels.get(currentLevelIndex);
+            logger.info("Loading level {} of {}: {}",
+                currentLevelIndex + 1, levels.size(), level.getFilePath());
+
             Rules rules = new Rules(level);
             rules.initRules(level);
             Transmutation transmutation = new Transmutation(level, rules);
+
+            logger.debug("Rendering initial state for level: {}", level.getFilePath());
             renderer.render(level);
+            logger.info("Level loaded and rendered successfully");
         } else {
             isFinished = true;
-            System.out.println("All levels completed!");
+            logger.info("All levels completed!");
         }
     }
 
