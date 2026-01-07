@@ -170,8 +170,13 @@ public class Game {
                 return;
             }
             case RESTART -> {
-                // Logic to reset the current level would go here
-                // For now, simple return
+                // RESTART is now handled in GameWebSocketHandler
+                logger.debug("RESTART action received (handled by WebSocketHandler)");
+                return;
+            }
+            case UNDO -> {
+                // UNDO not implemented yet - would need state history
+                logger.debug("UNDO requested but not implemented");
                 return;
             }
             case MOVE_LEFT -> direction = Direction.LEFT;

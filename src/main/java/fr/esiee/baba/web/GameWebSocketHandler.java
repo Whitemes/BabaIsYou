@@ -50,6 +50,8 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
 
         // Load levels from classpath
         List<Level> levels = new ArrayList<>();
+        List<LevelResource> levelResources = new ArrayList<>();
+
         try {
             logger.debug("Loading levels from classpath...");
 
@@ -71,6 +73,9 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
                 for (Resource res : resources) {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(res.getInputStream()))) {
                         List<String> lines = reader.lines().toList();
+                        // Store original level data for restart functionality
+                        levelResources.add(new LevelResource(res.getFilename(), new ArrayList<>(lines)));
+
                         Level level = Game.parseLevel(lines, res.getFilename());
                         levels.add(level);
                         logger.debug("Loaded level: {}", res.getFilename());
@@ -100,7 +105,7 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
         logger.info("Successfully loaded {} levels for session {}", levels.size(), session.getId());
 
         Game game = new Game(levels, sessionRenderer);
-        GameSession gameSession = new GameSession(game, session);
+        GameSession gameSession = new GameSession(game, session, levelResources);
         sessions.put(session.getId(), gameSession);
 
         logger.info("Starting game for session: {}", session.getId());
@@ -118,6 +123,12 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
         String payload = message.getPayload();
         logger.debug("Received action from client - Session: {}, Action: {}", session.getId(), payload);
 
+        // Handle RESTART specially - reload the current level
+        if ("RESTART".equalsIgnoreCase(payload)) {
+            handleRestart(gameSession, session);
+            return;
+        }
+
         try {
             GameAction action = GameAction.valueOf("MOVE_" + payload.toUpperCase());
             gameSession.game.handleAction(action);
@@ -131,6 +142,48 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
+    private void handleRestart(GameSession gameSession, WebSocketSession session) {
+        logger.info("Handling RESTART request for session: {}", session.getId());
+
+        try {
+            // Get current level index from game (we need to add a getter for this)
+            // For now, we'll reload all levels and restart the game
+            List<Level> freshLevels = new ArrayList<>();
+
+            for (LevelResource levelRes : gameSession.levelResources) {
+                Level level = Game.parseLevel(levelRes.lines, levelRes.filename);
+                freshLevels.add(level);
+            }
+
+            logger.info("Reloaded {} levels for restart", freshLevels.size());
+
+            // Create new renderer
+            Renderer sessionRenderer = level -> {
+                try {
+                    if (session.isOpen()) {
+                        String json = objectMapper.writeValueAsString(level.getGrid());
+                        session.sendMessage(new TextMessage(json));
+                        logger.debug("Sent game state to client - Session: {}", session.getId());
+                    }
+                } catch (IOException e) {
+                    logger.error("Failed to send game state to client - Session: {}", session.getId(), e);
+                }
+            };
+
+            // Create new game with fresh levels
+            Game newGame = new Game(freshLevels, sessionRenderer);
+            gameSession.game = newGame;
+
+            // Start the game (which renders the initial level)
+            newGame.start();
+
+            logger.info("Game restarted successfully for session: {}", session.getId());
+
+        } catch (Exception e) {
+            logger.error("Failed to restart game for session: {}", session.getId(), e);
+        }
+    }
+
     @Override
     public void afterConnectionClosed(WebSocketSession session, org.springframework.web.socket.CloseStatus status) throws Exception {
         sessions.remove(session.getId());
@@ -140,10 +193,22 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
     private static class GameSession {
         Game game;
         WebSocketSession session;
+        List<LevelResource> levelResources; // Store original level data for restart
 
-        public GameSession(Game game, WebSocketSession session) {
+        public GameSession(Game game, WebSocketSession session, List<LevelResource> levelResources) {
             this.game = game;
             this.session = session;
+            this.levelResources = levelResources;
+        }
+    }
+
+    private static class LevelResource {
+        String filename;
+        List<String> lines;
+
+        public LevelResource(String filename, List<String> lines) {
+            this.filename = filename;
+            this.lines = lines;
         }
     }
 }
