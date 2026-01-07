@@ -3,15 +3,11 @@ package fr.esiee.baba.controller;
 import fr.esiee.baba.core.Renderer;
 import fr.esiee.baba.model.*;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.*;
 import java.util.*;
 
 /**
  * Controls the overall game flow for "BABA IS YOU".
- * Refactored to be Event-Driven for WebSockets.
+ * Refactored to be Event-Driven for WebSockets and Container-Ready.
  */
 public class Game {
     private final List<Level> levels;
@@ -26,142 +22,41 @@ public class Game {
     }
 
     /**
-     * Constructs a Game instance.
+     * Constructs a Game instance with pre-loaded levels.
      *
-     * @param levelDirectoryPath path to levels.
-     * @param renderer           output for rendering.
+     * @param levels   list of loaded levels.
+     * @param renderer output for rendering.
      */
-    public Game(String levelDirectoryPath, Renderer renderer) {
+    public Game(List<Level> levels, Renderer renderer) {
         this.elementMap = createElementMap();
-        this.levels = loadLevels(levelDirectoryPath);
+        this.levels = levels;
         this.currentLevelIndex = 0;
         this.renderer = renderer;
     }
 
     /**
-     * Single level constructor.
+     * Parses a list of strings into a Level object.
+     * 
+     * @param lines the lines of the level file.
+     * @param name  identifier for the level.
+     * @return the constructed Level.
      */
-    public Game(String levelFilePath, boolean isSingleLevel, Renderer renderer) {
-        this.elementMap = createElementMap();
-        this.levels = new ArrayList<>();
-        this.levels.add(loadLevel(levelFilePath));
-        this.currentLevelIndex = 0;
-        this.renderer = renderer;
-    }
-
-    /**
-     * Starts the main game loop.
-     */
-    public void start() {
-        if (levels.isEmpty()) {
-            System.out.println("No levels found.");
-            return;
-        }
-        loadCurrentLevel();
-    }
-
-    private void loadCurrentLevel() {
-        if (currentLevelIndex < levels.size()) {
-            Level level = levels.get(currentLevelIndex);
-            Rules rules = new Rules(level);
-            // Initial init
-            rules.initRules(level);
-            Transmutation transmutation = new Transmutation(level, rules);
-
-            // Store these if needed, currently recreated on update?
-            // Actually, level keeps state. Rules need to be refreshed.
-            // Transmutation is transient per update usually.
-
-            renderer.render(level);
-        } else {
-            isFinished = true;
-            System.out.println("All levels completed!");
-        }
-    }
-
-    public void handleAction(GameAction action) {
-        if (isFinished || currentLevelIndex >= levels.size())
-            return;
-
-        Level level = levels.get(currentLevelIndex);
-        Rules rules = new Rules(level); // Re-evaluate rules? Or keep persistent?
-        // Original code created new Rules(level) every playNextLevel.
-        // But inside the loop it did rules.initRules(level).
-
-        Transmutation transmutation = new Transmutation(level, rules);
-
-        Direction direction = null;
-        switch (action) {
-            case QUIT -> {
-                isFinished = true;
-                return;
-            }
-            case RESTART -> {
-                // Reload level logic would go here
-                return;
-            }
-            case MOVE_LEFT -> direction = Direction.LEFT;
-            case MOVE_RIGHT -> direction = Direction.RIGHT;
-            case MOVE_UP -> direction = Direction.UP;
-            case MOVE_DOWN -> direction = Direction.DOWN;
-            default -> {
-            }
-        }
-
-        if (direction != null) {
-            boolean isJump = rules.hasProperty(level.getYouElements(), Property.JUMP);
-            level.update(direction, isJump);
-            rules.initRules(level);
-            transmutation.setTransmutation(level, rules);
-
-            if (level.isCompleted()) {
-                currentLevelIndex++;
-                if (currentLevelIndex < levels.size()) {
-                    loadCurrentLevel();
-                } else {
-                    isFinished = true;
-                    System.out.println("Game Completed!");
-                }
-            } else {
-                renderer.render(level); // Render updated state
-            }
-        }
-    }
-
-    public boolean isFinished() {
-        return isFinished;
-    }
-
-    // --- Data Loading Methods (Unchanged mostly) ---
-
-    private Level loadLevel(String path) {
+    public static Level parseLevel(List<String> lines, String name) {
         var grid = new ArrayList<List<Cellule>>();
-        try (var reader = new BufferedReader(new FileReader(path))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (!line.isEmpty()) {
-                    grid.add(parseLineToRow(line));
-                }
+        Game parser = new Game(new ArrayList<>(), null); // dummy for map access? Or make map static?
+        // Actually, the map logic is inside Game instance. Let's make helper static or
+        // expose it.
+        // Better: static helper for parsing.
+
+        for (String line : lines) {
+            if (!line.isEmpty()) {
+                grid.add(parseLineToRow(line));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        return new Level(grid, path);
+        return new Level(grid, name);
     }
 
-    private List<Level> loadLevels(String directoryPath) {
-        var levels = new ArrayList<Level>();
-        try (var stream = Files.newDirectoryStream(Paths.get(directoryPath), "*.txt")) {
-            for (var entry : stream) {
-                levels.add(loadLevel(entry.toString()));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return levels;
-    }
-
-    private List<Cellule> parseLineToRow(String line) {
+    private static List<Cellule> parseLineToRow(String line) {
         var row = new ArrayList<Cellule>();
         var tokens = line.split(" ");
         for (var token : tokens) {
@@ -176,11 +71,17 @@ public class Game {
         return row;
     }
 
-    public Element stringToElement(String token) {
-        return elementMap.getOrDefault(token, Element.EMPTY);
+    public static Element stringToElement(String token) {
+        // We can recreate the map or look it up.
+        // For simplicity, let's just use the static map method here for now to avoid
+        // instance dependency.
+        return STATIC_ELEMENT_MAP.getOrDefault(token, Element.EMPTY);
     }
 
-    private Map<String, Element> createElementMap() {
+    // Static map for parsing
+    private static final Map<String, Element> STATIC_ELEMENT_MAP = createElementMapStatic();
+
+    private static Map<String, Element> createElementMapStatic() {
         var map = new HashMap<String, Element>();
         map.put("b", Element.BABA);
         map.put("f", Element.FLAG);
@@ -217,6 +118,80 @@ public class Game {
         return map;
     }
 
-    // Main method removed or needs to be adapted to launch via Spring or CLI
-    // wrapper
+    // Instance map (kept for compatibility or future dynamic use)
+    private Map<String, Element> createElementMap() {
+        return STATIC_ELEMENT_MAP;
+    }
+
+    public void start() {
+        if (levels.isEmpty()) {
+            System.out.println("No levels found.");
+            return;
+        }
+        loadCurrentLevel();
+    }
+
+    private void loadCurrentLevel() {
+        if (currentLevelIndex < levels.size()) {
+            Level level = levels.get(currentLevelIndex);
+            Rules rules = new Rules(level);
+            rules.initRules(level);
+            Transmutation transmutation = new Transmutation(level, rules);
+            renderer.render(level);
+        } else {
+            isFinished = true;
+            System.out.println("All levels completed!");
+        }
+    }
+
+    public void handleAction(GameAction action) {
+        if (isFinished || currentLevelIndex >= levels.size())
+            return;
+
+        Level level = levels.get(currentLevelIndex);
+        Rules rules = new Rules(level);
+        Transmutation transmutation = new Transmutation(level, rules);
+
+        Direction direction = null;
+        switch (action) {
+            case QUIT -> {
+                isFinished = true;
+                return;
+            }
+            case RESTART -> {
+                // Logic to reset the current level would go here
+                // For now, simple return
+                return;
+            }
+            case MOVE_LEFT -> direction = Direction.LEFT;
+            case MOVE_RIGHT -> direction = Direction.RIGHT;
+            case MOVE_UP -> direction = Direction.UP;
+            case MOVE_DOWN -> direction = Direction.DOWN;
+            default -> {
+            }
+        }
+
+        if (direction != null) {
+            boolean isJump = rules.hasProperty(level.getYouElements(), Property.JUMP);
+            level.update(direction, isJump);
+            rules.initRules(level);
+            transmutation.setTransmutation(level, rules);
+
+            if (level.isCompleted()) {
+                currentLevelIndex++;
+                if (currentLevelIndex < levels.size()) {
+                    loadCurrentLevel();
+                } else {
+                    isFinished = true;
+                    System.out.println("Game Completed!");
+                }
+            } else {
+                renderer.render(level);
+            }
+        }
+    }
+
+    public boolean isFinished() {
+        return isFinished;
+    }
 }
