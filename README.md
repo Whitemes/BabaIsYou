@@ -446,5 +446,5 @@ Production refactoring: **Claude Agent SDK (Anthropic)**
 - Real-time communication (WebSockets)
 - Clean architecture & design patterns
 
-**GitHub Repository:** [Update with your repo URL]
-**Live Demo:** [Update with your Railway URL]
+**GitHub Repository:** [[https://github.com/Whitemes/BabaIsYou](https://github.com/Whitemes/BabaIsYou)]
+**Live Demo:** [[https://babaisyou-production.up.railway.app](https://babaisyou-production.up.railway.app)]
