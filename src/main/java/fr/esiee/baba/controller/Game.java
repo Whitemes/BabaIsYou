@@ -140,13 +140,13 @@ public class Game {
         if (currentLevelIndex < levels.size()) {
             Level level = levels.get(currentLevelIndex);
             logger.info("Loading level {} of {}: {}",
-                currentLevelIndex + 1, levels.size(), level.getFilePath());
+                currentLevelIndex + 1, levels.size(), level.getLevelFilePath());
 
             Rules rules = new Rules(level);
             rules.initRules(level);
             Transmutation transmutation = new Transmutation(level, rules);
 
-            logger.debug("Rendering initial state for level: {}", level.getFilePath());
+            logger.debug("Rendering initial state for level: {}", level.getLevelFilePath());
             renderer.render(level);
             logger.info("Level loaded and rendered successfully");
         } else {
