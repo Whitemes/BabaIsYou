@@ -194,13 +194,11 @@ gradle bootRun
 ## 🚧 Known Limitations
 
 ### Not Implemented
-- **UNDO (Z key):** Would require state history system (Memento pattern)
 - **Level progression persistence:** Current level resets on browser refresh
 - **Multiplayer:** Each WebSocket session is independent
 - **Mobile touch controls:** Arrow keys only
 
 ### Future Enhancements
-- State history for UNDO
 - Level editor (create custom levels via UI)
 - Leaderboard (completion time)
 - Sound effects
