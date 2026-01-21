@@ -6,7 +6,7 @@ A professional reimplementation of the "Baba Is You" puzzle game engine, focusin
 ![Stack](https://img.shields.io/badge/Tech-Java%2021%20%7C%20Spring%20Boot%203%20%7C%20WebSockets%20%7C%20Docker-blue)
 ![Deployment](https://img.shields.io/badge/Deploy-Railway-blueviolet)
 
-> **🎮 [Play Live on Railway](https://babaisyou-production.up.railway.app)** *(Update with your actual Railway URL)*
+> **🎮 [Play Live on Railway](https://babaisyou-production.up.railway.app)**
 
 ## 🚀 Project Overview
 
